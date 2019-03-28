@@ -59,6 +59,21 @@ func (gs *gracefulServer) logger() logger.Log {
 	return gs.log
 }
 
+func (gs *gracefulServer) updateServerNames() {
+	// 如果就一个服务器
+	if len(gs.servers) == 1 && gs.servers[0].name == "" {
+		gs.servers[0].name = fmt.Sprintf("server-%d", os.Getpid())
+		return
+	}
+
+	// 给未命名的服务器命名
+	for index, server := range gs.servers {
+		if server.name == "" {
+			server.name = fmt.Sprintf("server-%d", index)
+		}
+	}
+}
+
 func (gs *gracefulServer) close() {
 	if len(gs.servers) == 0 {
 		return
@@ -140,6 +155,8 @@ func (gs *gracefulServer) listenSignal(f func()) {
 	if len(gs.servers) == 0 {
 		return
 	}
+
+	gs.updateServerNames()
 
 	if len(gs.restartSignals) == 0 {
 		gs.restartSignals = []os.Signal{syscall.SIGUSR1, syscall.SIGUSR2}
