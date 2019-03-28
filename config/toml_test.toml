@@ -1,0 +1,12 @@
+title = "test toml file"
+
+[user]
+tokenPrefix = "user"
+minAge = 18
+
+[server]
+host = "127.0.0.1"
+port = 8080
+
+[server.group]
+count = 10
