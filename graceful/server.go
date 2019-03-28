@@ -23,7 +23,7 @@ func AddServer(servers ...*http.Server) {
 // sig: 重启信号
 func RegisterRestartSignal(sig ...os.Signal) {
 	if len(sig) == 0 {
-		panic("If sig is empty, it is better not to call this function.")
+		return
 	}
 	if len(gserver.servers) == 0 {
 		panic("Please call AddServer first.")
@@ -37,7 +37,7 @@ func RegisterRestartSignal(sig ...os.Signal) {
 // sig: 退出信号
 func RegisterCloseSignal(sig ...os.Signal) {
 	if len(sig) == 0 {
-		panic("If sig is empty, it is better not to call this function.")
+		return
 	}
 	if len(gserver.servers) == 0 {
 		panic("Please call AddServer first.")

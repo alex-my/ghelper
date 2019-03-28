@@ -31,13 +31,14 @@ type gracefulServer struct {
 	log logger.Log
 }
 
-var gserver *gracefulServer
+var (
+	gserver                *gracefulServer
+	defaultShutdownTimeout = 5
+)
 
 func init() {
 	gserver = &gracefulServer{
-		restartSignals:  []os.Signal{syscall.SIGUSR1, syscall.SIGUSR2},
-		closeSignals:    []os.Signal{syscall.SIGINT, syscall.SIGTERM},
-		shutdownTimeout: 5,
+		shutdownTimeout: defaultShutdownTimeout,
 	}
 }
 
@@ -119,8 +120,12 @@ func (gs *gracefulServer) listenSignal(f func()) {
 	if len(gs.servers) == 0 {
 		return
 	}
-	if len(gs.restartSignals) == 0 && len(gs.closeSignals) == 0 {
-		return
+
+	if len(gs.restartSignals) == 0 {
+		gs.restartSignals = []os.Signal{syscall.SIGUSR1, syscall.SIGUSR2}
+	}
+	if len(gs.closeSignals) == 0 {
+		gs.closeSignals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
 	}
 
 	go f()
