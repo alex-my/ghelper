@@ -10,11 +10,18 @@ import (
 // Package 优雅的关闭和重启 http.Server
 
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
-func AddServer(servers ...*http.Server) {
-	if len(servers) == 0 {
-		panic("servers does not be empty")
+func AddServer(server *http.Server, opts ...Option) {
+	hs := &httpServer{
+		server:  server,
+		timeout: -1,
 	}
-	gserver.servers = append(gserver.servers, servers...)
+
+	// 添加额外选项
+	for _, opt := range opts {
+		opt(hs)
+	}
+
+	gserver.servers = append(gserver.servers, hs)
 }
 
 // RegisterRestartSignal 设置响应重启的信号，接收到信号之后会优雅的重启服务器
@@ -28,6 +35,7 @@ func RegisterRestartSignal(sig ...os.Signal) {
 	if len(gserver.servers) == 0 {
 		panic("Please call AddServer first.")
 	}
+
 	gserver.restartSignals = append(gserver.restartSignals, sig...)
 }
 
@@ -42,12 +50,14 @@ func RegisterCloseSignal(sig ...os.Signal) {
 	if len(gserver.servers) == 0 {
 		panic("Please call AddServer first.")
 	}
+
 	gserver.closeSignals = append(gserver.closeSignals, sig...)
 }
 
 // SetShutdownTimeout 设置优雅退出超时时间
 // 服务器会每隔500毫秒检查一次连接是否都断开处理完毕
 // 如果超过超时时间，就不再检查，直接退出
+// 如果要单独给指定的服务器设置 超时时间，可以使用 WithTimeout
 //
 // timeout: 单位：秒，当 <= 0 时无效，直接退出
 func SetShutdownTimeout(timeout int) {
@@ -56,13 +66,15 @@ func SetShutdownTimeout(timeout int) {
 
 // RegisterShutdownHandler 注册关闭函数
 // 按照注册的顺序调用这些函数
+// 所有已经添加的服务器都会响应这个函数
+// 如果要单独给指定的服务器添加 关闭函数，可以使用 WithShutdownHandler
 func RegisterShutdownHandler(f func()) {
 	if len(gserver.servers) == 0 {
 		panic("Please call AddServer first.")
 	}
 
 	for _, server := range gserver.servers {
-		server.RegisterOnShutdown(f)
+		server.server.RegisterOnShutdown(f)
 	}
 }
 

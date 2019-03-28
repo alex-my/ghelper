@@ -2,6 +2,7 @@ package graceful
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,7 +14,7 @@ import (
 
 // gracefulServer 管理 http.Server
 type gracefulServer struct {
-	servers []*http.Server
+	servers []*httpServer
 
 	// shutdownTimeout 退出时的超时时间，单位: 秒
 	shutdownTimeout int
@@ -29,6 +30,12 @@ type gracefulServer struct {
 
 	// log 日志
 	log logger.Log
+}
+
+type httpServer struct {
+	server  *http.Server
+	name    string
+	timeout int
 }
 
 var (
@@ -61,12 +68,11 @@ func (gs *gracefulServer) close() {
 	logger := gs.logger()
 
 	for _, server := range gs.servers {
-		err := server.Close()
-		if logEnable {
-			if err != nil {
-				logger.Errorf("Server close: %s", err.Error())
+		if err := server.server.Close(); logEnable {
+			if err != nil && err != http.ErrServerClosed {
+				logger.Errorf("Server: %s close, err: %s", server.name, err.Error())
 			} else {
-				logger.Infof("Server exiting")
+				logger.Infof("Server: %s exiting", server.name)
 			}
 		}
 	}
@@ -80,31 +86,42 @@ func (gs *gracefulServer) shutdown(timeout int) {
 	logEnable := gs.isLogEnable()
 	logger := gs.logger()
 	for _, server := range gs.servers {
-		if timeout > 0 {
-			ctx, cancel := context.WithTimeout(context.TODO(), time.Second(timeout))
+		_applyTimeout := timeout
+
+		// 判断该服务器是否单独指定了超时时间
+		if server.timeout != -1 {
+			_applyTimeout = server.timeout
+		}
+
+		if _applyTimeout > 0 {
+			ctx, cancel := context.WithTimeout(context.TODO(), time.Second(_applyTimeout))
 			defer cancel()
 
-			if err := server.Shutdown(ctx); err != nil {
-				if logEnable {
-					logger.Errorf("Server shutdown with timeout: %s", err.Error())
+			if err := server.server.Shutdown(ctx); logEnable {
+				if err != nil && err != http.ErrServerClosed {
+					logger.Errorf("Server: %s shutdown with timeout, err: %s", server.name, err.Error())
+				} else {
+					logger.Infof("Server: %s shutdown with timeout", server.name)
 				}
 			}
 			select {
 			case <-ctx.Done():
 				if logEnable {
-					logger.Infof("timeout of %d seconds", timeout)
+					logger.Infof("server: %s timeout of %d seconds", server.name, _applyTimeout)
 				}
 			}
 		} else {
 			ctx := context.TODO()
-			if err := server.Shutdown(ctx); err != nil {
-				if logEnable {
-					logger.Errorf("Server shutdown: %s", err.Error())
+			if err := server.server.Shutdown(ctx); logEnable {
+				if err != nil && err != http.ErrServerClosed {
+					logger.Errorf("Server: %s shutdown, err: %s", server.name, err.Error())
+				} else {
+					logger.Infof("Server: %s shutdown", server.name)
 				}
 			}
 		}
 		if logEnable {
-			logger.Infof("Server exiting")
+			logger.Infof("Server: %s exiting", server.name)
 		}
 	}
 	if logEnable {
@@ -113,7 +130,10 @@ func (gs *gracefulServer) shutdown(timeout int) {
 }
 
 func (gs *gracefulServer) restart() {
+	// 新实例启动，等父进程(旧实例)退出后，新实例由 init 进程托管
 
+	// 旧实例停止监听，并优雅关闭
+	gs.shutdown(gs.shutdownTimeout)
 }
 
 func (gs *gracefulServer) listenSignal(f func()) {
@@ -126,6 +146,16 @@ func (gs *gracefulServer) listenSignal(f func()) {
 	}
 	if len(gs.closeSignals) == 0 {
 		gs.closeSignals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
+	}
+
+	// 检测信号是否同时出现在 重启信号和关闭信号中
+	// 信号数量不多，直接遍历
+	for _, sig := range gs.restartSignals {
+		for _, sig2 := range gs.closeSignals {
+			if sig == sig2 {
+				panic(fmt.Sprintf("Sig: %d exist in both the restart and shutdown queues", sig))
+			}
+		}
 	}
 
 	go f()
