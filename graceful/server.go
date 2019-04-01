@@ -7,7 +7,8 @@ import (
 	"github.com/alex-my/ghelper/logger"
 )
 
-// Package 优雅的关闭和重启 http.Server
+// Package 优雅的关闭 http.Server
+// TODO: 优雅的重启
 
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
 func AddServer(server *http.Server, opts ...Option) {
