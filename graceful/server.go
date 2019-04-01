@@ -14,7 +14,25 @@ import (
 // Server 替代 http.Server
 type Server struct {
 	*http.Server
-	tc tcpKeepAliveListener
+	tc tcpKeepAliveListener // 用于复制文件描述符 dup
+}
+
+// NewServer ..
+func NewServer(handler http.Handler, addr string) (*Server, error) {
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+
+	// 结构体初始化: 如果匿名字段也要初始化，则采取不声明 key 的方式
+	server := &Server{&http.Server{
+		Addr:    addr,
+		Handler: handler,
+	}, tc}
+
+	return server, nil
 }
 
 // ListenAndServe ..
@@ -24,16 +42,7 @@ func (server *Server) ListenAndServe() error {
 		addr = ":http"
 	}
 
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		return err
-	}
-
-	// 用于复制文件描述符 dup
-	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
-	server.tc = tc
-
-	return server.Serve(tc)
+	return server.Serve(server.tc)
 }
 
 // ListenAndServeTLS ..
@@ -43,17 +52,9 @@ func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
 		addr = ":https"
 	}
 
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		return err
-	}
-	defer ln.Close()
+	defer server.tc.Close()
 
-	// 用于复制文件描述符 dup
-	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
-	server.tc = tc
-
-	return server.ServeTLS(tc, certFile, keyFile)
+	return server.ServeTLS(server.tc, certFile, keyFile)
 }
 
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
