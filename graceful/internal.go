@@ -3,6 +3,7 @@ package graceful
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -33,7 +34,7 @@ type gracefulServer struct {
 }
 
 type httpServer struct {
-	server  *http.Server
+	server  *Server
 	name    string
 	timeout int
 }
@@ -214,4 +215,20 @@ func (gs *gracefulServer) listenSignal(f func()) {
 			return
 		}
 	}
+}
+
+type tcpKeepAliveListener struct {
+	*net.TCPListener
+}
+
+func (ln tcpKeepAliveListener) Accept() (net.Conn, error) {
+	tc, err := ln.AcceptTCP()
+	if err != nil {
+		return nil, err
+	}
+
+	tc.SetKeepAlive(true)
+	tc.SetKeepAlivePeriod(time.Minute(3))
+
+	return tc, nil
 }

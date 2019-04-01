@@ -1,6 +1,7 @@
 package graceful
 
 import (
+	"net"
 	"net/http"
 	"os"
 
@@ -10,8 +11,53 @@ import (
 // Package 优雅的关闭 http.Server
 // TODO: 优雅的重启
 
+// Server 替代 http.Server
+type Server struct {
+	*http.Server
+	tc tcpKeepAliveListener
+}
+
+// ListenAndServe ..
+func (server *Server) ListenAndServe() error {
+	addr := server.Addr
+	if addr == "" {
+		addr = ":http"
+	}
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+
+	// 用于复制文件描述符 dup
+	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+	server.tc = tc
+
+	return server.Serve(tc)
+}
+
+// ListenAndServeTLS ..
+func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
+	addr := server.Addr
+	if addr == "" {
+		addr = ":https"
+	}
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
+
+	// 用于复制文件描述符 dup
+	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+	server.tc = tc
+
+	return server.ServeTLS(tc, certFile, keyFile)
+}
+
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
-func AddServer(server *http.Server, opts ...Option) {
+func AddServer(server *Server, opts ...Option) {
 	hs := &httpServer{
 		server:  server,
 		timeout: -1,
