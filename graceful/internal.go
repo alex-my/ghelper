@@ -15,7 +15,7 @@ import (
 
 // gracefulServer 管理 http.Server
 type gracefulServer struct {
-	servers []*httpServer
+	servers []*Server
 
 	// shutdownTimeout 退出时的超时时间，单位: 秒
 	shutdownTimeout int
@@ -31,12 +31,6 @@ type gracefulServer struct {
 
 	// log 日志
 	log logger.Log
-}
-
-type httpServer struct {
-	server  *Server
-	name    string
-	timeout int
 }
 
 var (
@@ -84,7 +78,7 @@ func (gs *gracefulServer) close() {
 	logger := gs.logger()
 
 	for _, server := range gs.servers {
-		if err := server.server.Close(); logEnable {
+		if err := server.Close(); logEnable {
 			if err != nil && err != http.ErrServerClosed {
 				logger.Errorf("Server: %s close, err: %s", server.name, err.Error())
 			} else {
@@ -113,7 +107,7 @@ func (gs *gracefulServer) shutdown(timeout int) {
 			ctx, cancel := context.WithTimeout(context.TODO(), time.Second(_applyTimeout))
 			defer cancel()
 
-			if err := server.server.Shutdown(ctx); logEnable {
+			if err := server.Shutdown(ctx); logEnable {
 				if err != nil && err != http.ErrServerClosed {
 					logger.Errorf("Server: %s shutdown with timeout, err: %s", server.name, err.Error())
 				} else {
@@ -128,7 +122,7 @@ func (gs *gracefulServer) shutdown(timeout int) {
 			}
 		} else {
 			ctx := context.TODO()
-			if err := server.server.Shutdown(ctx); logEnable {
+			if err := server.Shutdown(ctx); logEnable {
 				if err != nil && err != http.ErrServerClosed {
 					logger.Errorf("Server: %s shutdown, err: %s", server.name, err.Error())
 				} else {

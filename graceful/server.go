@@ -14,7 +14,9 @@ import (
 // Server 替代 http.Server
 type Server struct {
 	*http.Server
-	tc tcpKeepAliveListener // 用于复制文件描述符 dup
+	tc      tcpKeepAliveListener // 用于复制文件描述符 dup
+	name    string
+	timeout int // 可以为服务器单独指定超时时间
 }
 
 // NewServer ..
@@ -30,7 +32,7 @@ func NewServer(handler http.Handler, addr string) (*Server, error) {
 	server := &Server{&http.Server{
 		Addr:    addr,
 		Handler: handler,
-	}, tc}
+	}, tc, "", -1}
 
 	return server, nil
 }
@@ -59,17 +61,12 @@ func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
 
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
 func AddServer(server *Server, opts ...Option) {
-	hs := &httpServer{
-		server:  server,
-		timeout: -1,
-	}
-
 	// 添加额外选项
 	for _, opt := range opts {
-		opt(hs)
+		opt(server)
 	}
 
-	gserver.servers = append(gserver.servers, hs)
+	gserver.servers = append(gserver.servers, server)
 }
 
 // RegisterRestartSignal 设置响应重启的信号，接收到信号之后会优雅的重启服务器
@@ -122,7 +119,7 @@ func RegisterShutdownHandler(f func()) {
 	}
 
 	for _, server := range gserver.servers {
-		server.server.RegisterOnShutdown(f)
+		server.RegisterOnShutdown(f)
 	}
 }
 
