@@ -1,6 +1,7 @@
 package graceful
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -61,6 +62,10 @@ func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
 
 // AddServer 服务器加进来后，就可以优雅的关闭和重启
 func AddServer(server *Server, opts ...Option) {
+	fmt.Println("[AddServer] enter")
+	if server == nil {
+		fmt.Println("[AddServer] server is nil")
+	}
 	// 添加额外选项
 	for _, opt := range opts {
 		opt(server)
