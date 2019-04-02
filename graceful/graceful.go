@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"syscall"
 
@@ -140,8 +141,62 @@ func (gs *gracefulServer) shutdown(timeout int) {
 
 func (gs *gracefulServer) restart() {
 	// 新实例启动，等父进程(旧实例)退出后，新实例由 init 进程托管
-
 	// 旧实例停止监听，并优雅关闭
+	// gs.shutdown(gs.shutdownTimeout)
+
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(fmt.Sprintf("get dir failed: %s", err.Error()))
+	}
+
+	// args := []string{}
+	// for _, arg := range os.Args {
+	// 	if arg == "-continue" {
+	// 		continue
+	// 	}
+	// 	args = append(args, arg)
+	// }
+	// args = append(args, "-continue")
+
+	files := []*os.File{os.Stdin, os.Stdout, os.Stderr}
+	for _, server := range gs.servers {
+		listenFile, err := server.ListenFile()
+		if err != nil {
+			panic(fmt.Sprintf("server: %s, get listenFile failed: %s", server.name, err.Error()))
+		}
+		files = append(files, listenFile)
+	}
+
+	// ----------------- 1 syscall.ForkExec
+	// execSpec := &syscall.ProcAttr{
+	// 	Env:   os.Environ(),
+	// 	Files: files,
+	// }
+	// forkID, err := syscall.ForkExec(os.Args[0], args, execSpec)
+	// if err != nil {
+	// 	panic(fmt.Sprintf("syscall.ForkExec failed: %s", err.Error()))
+	// }
+	// if gs.isLogEnable() {
+	// 	gs.logger().Infof("restart success, new pid: %d", forkID)
+	// }
+
+	// ----------------- 2 os.StartProcesses
+	argv0, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		panic(fmt.Sprintf("%s look path failed: %s", os.Args[0], err.Error()))
+	}
+	process, err := os.StartProcess(argv0, os.Args, &os.ProcAttr{
+		Dir:   dir,
+		Env:   os.Environ(),
+		Files: files,
+	})
+	if err != nil {
+		panic(fmt.Sprintf("start new process failed: %s", err.Error()))
+	}
+	if gs.isLogEnable() {
+		gs.logger().Infof("restart success, new pid: %d", process.Pid)
+	}
+
 	gs.shutdown(gs.shutdownTimeout)
 }
 

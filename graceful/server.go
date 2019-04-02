@@ -3,6 +3,7 @@ package graceful
 import (
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/alex-my/ghelper/time"
 )
@@ -20,7 +21,6 @@ type Server struct {
 
 // NewServer ..
 func NewServer(handler http.Handler, addr string) (*Server, error) {
-
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		return nil, err
@@ -56,6 +56,15 @@ func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	defer server.tc.Close()
 
 	return server.ServeTLS(server.tc, certFile, keyFile)
+}
+
+// ListenFile 获取监听套接字文件
+func (server *Server) ListenFile() (*os.File, error) {
+	file, err := server.tc.File()
+	if err != nil {
+		return nil, nil
+	}
+	return file, nil
 }
 
 type tcpKeepAliveListener struct {
