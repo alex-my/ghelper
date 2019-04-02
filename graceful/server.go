@@ -62,8 +62,8 @@ func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	return server.ServeTLS(server.tc, certFile, keyFile)
 }
 
-// ListenFile 获取监听套接字文件
-func (server *Server) ListenFile() (*os.File, error) {
+// listenFile 获取监听套接字文件
+func (server *Server) listenFile() (*os.File, error) {
 	file, err := server.tc.File()
 	if err != nil {
 		return nil, nil
@@ -75,6 +75,7 @@ func (server *Server) ListenFile() (*os.File, error) {
 func listen(addr string) (ln net.Listener, err error) {
 	if _, ok := syscall.Getenv(envNewKey); ok {
 		fp := os.NewFile(3, "")
+		defer fp.Close()
 		ln, err = net.FileListener(fp)
 	} else {
 		ln, err = net.Listen("tcp", addr)

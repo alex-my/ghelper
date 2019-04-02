@@ -6,6 +6,7 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"path"
 	"runtime"
 	"strconv"
@@ -212,11 +213,14 @@ func runtimeMessage(level int) string {
 	_, filename := path.Split(file)
 
 	funcName := strings.Split(runtime.FuncForPC(pc).Name(), "/")
+	pid := os.Getpid()
 
 	buff := Buffer()
 
 	buff.WriteString("[")
 	buff.WriteString(time.Date(time.YMDHMSM))
+	buff.WriteString("][")
+	buff.WriteString(strconv.FormatInt(int64(pid), 10))
 	buff.WriteString("][")
 	buff.WriteString(filename)
 	buff.WriteString(":")

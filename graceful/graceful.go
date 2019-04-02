@@ -3,10 +3,12 @@ package graceful
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/alex-my/ghelper/logger"
@@ -96,7 +98,7 @@ func RegisterShutdownHandler(f func()) error {
 }
 
 // ListenSignal 监听信号，阻塞
-func ListenSignal(f func()) {
+func ListenSignal() {
 	if len(gserver.restartSignals) == 0 {
 		gserver.restartSignals = []os.Signal{syscall.SIGUSR1, syscall.SIGUSR2}
 	}
@@ -114,8 +116,10 @@ func ListenSignal(f func()) {
 		}
 	}
 
-	go f()
+	go waitSignal()
+}
 
+func waitSignal() {
 	sigs := []os.Signal{}
 
 	sigs = append(sigs, gserver.restartSignals...)
@@ -133,6 +137,7 @@ func ListenSignal(f func()) {
 		if sig == s {
 			gserver.logger.Info("restart signal .. restart server ..")
 			Restart()
+			Shutdown()
 			return
 		}
 	}
@@ -173,9 +178,9 @@ func Shutdown() {
 
 		err := server.Shutdown(ctx)
 		if err != nil && err != http.ErrServerClosed {
-			logger.Errorf("server shutdown with timeout, err: %s", err.Error())
+			logger.Errorf("server shutdown, err: %s", err.Error())
 		} else {
-			logger.Info("server shutdown with timeout")
+			logger.Info("server shutdown")
 		}
 
 		select {
@@ -196,9 +201,6 @@ func Shutdown() {
 
 // Restart ..
 func Restart() {
-	// 新实例启动，等父进程(旧实例)退出后，新实例由 init 进程托管
-	// 旧实例停止监听，并优雅关闭
-	// gs.shutdown(gs.shutdownTimeout)
 	server := gserver.server
 	logger := gserver.logger
 
@@ -207,49 +209,37 @@ func Restart() {
 		logger.Fatalf("get dir failed: %s", err.Error())
 	}
 
-	// args := []string{}
-	// for _, arg := range os.Args {
-	// 	if arg == "-continue" {
-	// 		continue
-	// 	}
-	// 	args = append(args, arg)
-	// }
-	// args = append(args, "-continue")
-
 	files := []*os.File{os.Stdin, os.Stdout, os.Stderr}
-	listenFile, err := server.ListenFile()
+	listenFile, err := server.listenFile()
 	if err != nil {
 		logger.Fatalf("get listenFile failed: %s", err.Error())
 	}
+
+	// listenFile 是复制出来的
+	defer listenFile.Close()
+
 	files = append(files, listenFile)
 
-	// ----------------- 1 syscall.ForkExec
-	// execSpec := &syscall.ProcAttr{
-	// 	Env:   os.Environ(),
-	// 	Files: files,
-	// }
-	// forkID, err := syscall.ForkExec(os.Args[0], args, execSpec)
-	// if err != nil {
-	// 	panic(fmt.Sprintf("syscall.ForkExec failed: %s", err.Error()))
-	// }
-	// if gs.isLogEnable() {
-	// 	gs.logger().Infof("restart success, new pid: %d", forkID)
-	// }
+	env := []string{}
+	for _, s := range os.Environ() {
+		if !strings.HasPrefix(s, envNewKey) {
+			env = append(env, s)
+		}
+	}
+	env = append(env, fmt.Sprintf("%s=1", envNewKey))
 
-	// ----------------- 2 os.StartProcesses
 	argv0, err := exec.LookPath(os.Args[0])
 	if err != nil {
 		logger.Fatalf("%s look path failed: %s", os.Args[0], err.Error())
 	}
+
 	process, err := os.StartProcess(argv0, os.Args, &os.ProcAttr{
 		Dir:   dir,
-		Env:   os.Environ(),
+		Env:   env,
 		Files: files,
 	})
 	if err != nil {
 		logger.Fatalf("start new process failed: %s", err.Error())
 	}
-	gserver.logger.Infof("restart success, new pid: %d", process.Pid)
-
-	Shutdown()
+	logger.Infof("restart success, new pid: %d", process.Pid)
 }
