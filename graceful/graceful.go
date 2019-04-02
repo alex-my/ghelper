@@ -31,11 +31,12 @@ type gracefulServer struct {
 }
 
 var (
-	gserver *gracefulServer
+	gserver                *gracefulServer
+	defaultShutdownTimeout = 5
 )
 
 func init() {
-	gserver = &gracefulServer{}
+	gserver = &gracefulServer{shutdownTimeout: defaultShutdownTimeout}
 }
 
 // RegisterRestartSignal 设置响应重启的信号，接收到信号之后会优雅的重启服务器
