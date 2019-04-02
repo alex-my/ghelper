@@ -4,24 +4,25 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"syscall"
 
+	"github.com/alex-my/ghelper/logger"
 	"github.com/alex-my/ghelper/time"
 )
 
-// Package 优雅的关闭 http.Server
-// TODO: 优雅的重启
+// envNewKey 新创建的进程环境变量中拥有该标签
+var envNewKey = "newProcess"
 
 // Server 替代 http.Server
 type Server struct {
 	*http.Server
-	tc      tcpKeepAliveListener // 用于复制文件描述符 dup
-	name    string
-	timeout int // 可以为服务器单独指定超时时间
+	// tc 用于获取监控套接字文件
+	tc tcpKeepAliveListener
 }
 
 // NewServer ..
-func NewServer(handler http.Handler, addr string) (*Server, error) {
-	ln, err := net.Listen("tcp", addr)
+func NewServer(handler http.Handler, addr string, logger logger.Log) (*Server, error) {
+	ln, err := listen(addr)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +32,10 @@ func NewServer(handler http.Handler, addr string) (*Server, error) {
 	server := &Server{&http.Server{
 		Addr:    addr,
 		Handler: handler,
-	}, tc, "", -1}
+	}, tc}
+
+	gserver.server = server
+	gserver.logger = logger
 
 	return server, nil
 }
@@ -65,6 +69,17 @@ func (server *Server) ListenFile() (*os.File, error) {
 		return nil, nil
 	}
 	return file, nil
+}
+
+// listen 创建监听套接字
+func listen(addr string) (ln net.Listener, err error) {
+	if _, ok := syscall.Getenv(envNewKey); ok {
+		fp := os.NewFile(3, "")
+		ln, err = net.FileListener(fp)
+	} else {
+		ln, err = net.Listen("tcp", addr)
+	}
+	return
 }
 
 type tcpKeepAliveListener struct {
