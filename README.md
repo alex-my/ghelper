@@ -8,12 +8,13 @@
 
 - [x] array
 - [ ] bit
+- [ ] captcha
 - [x] config
 - [ ] convert
 - [x] crypto
 - [x] file
 - [ ] fuse 熔断器
-- [ ] graceful 优雅关闭/重启
+- [x] graceful 优雅关闭/重启
 - [x] human
 - [x] http
 - [ ] jwt

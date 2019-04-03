@@ -21,16 +21,11 @@ type Server struct {
 }
 
 // NewServer ..
-func NewServer(handler http.Handler, addr string, logger logger.Log) (*Server, error) {
-	ln, err := listen(addr)
-	if err != nil {
-		return nil, err
-	}
-	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+func NewServer(handler http.Handler, logger logger.Log) (*Server, error) {
+	var tc tcpKeepAliveListener
 
 	// 结构体初始化: 如果匿名字段也要初始化，则采取不声明 key 的方式
 	server := &Server{&http.Server{
-		Addr:    addr,
 		Handler: handler,
 	}, tc}
 
@@ -41,21 +36,37 @@ func NewServer(handler http.Handler, addr string, logger logger.Log) (*Server, e
 }
 
 // ListenAndServe ..
-func (server *Server) ListenAndServe() error {
-	addr := server.Addr
+func (server *Server) ListenAndServe(addr string) error {
 	if addr == "" {
 		addr = ":http"
 	}
+
+	ln, err := listen(addr)
+	if err != nil {
+		return err
+	}
+	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+
+	server.Addr = addr
+	server.tc = tc
 
 	return server.Serve(server.tc)
 }
 
 // ListenAndServeTLS ..
-func (server *Server) ListenAndServeTLS(certFile, keyFile string) error {
-	addr := server.Addr
+func (server *Server) ListenAndServeTLS(addr, certFile, keyFile string) error {
 	if addr == "" {
 		addr = ":https"
 	}
+
+	ln, err := listen(addr)
+	if err != nil {
+		return err
+	}
+	tc := tcpKeepAliveListener{ln.(*net.TCPListener)}
+
+	server.Addr = addr
+	server.tc = tc
 
 	defer server.tc.Close()
 
