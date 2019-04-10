@@ -216,6 +216,7 @@ func runtimeMessage(level int) string {
 	pid := os.Getpid()
 
 	buff := Buffer()
+	defer ReleaseBuffer(buff)
 
 	buff.WriteString("[")
 	buff.WriteString(time.Date(time.YMDHMSM))

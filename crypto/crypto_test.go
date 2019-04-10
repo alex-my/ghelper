@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -105,5 +106,59 @@ func TestURLEncode(t *testing.T) {
 func TestURLDecode(t *testing.T) {
 	if URLDecode("www.keylala.cn%3Fname%3Dalex%26age%3D18%26say%3D%E4%BD%A0%E5%A5%BD") != "www.keylala.cn?name=alex&age=18&say=你好" {
 		t.Error("URLDecode error")
+	}
+}
+
+func TestAesCBCEncode(t *testing.T) {
+	key := []byte("1234567890123456")
+	iv := []byte("1234567890123456")
+	value := []byte("abcdefg")
+
+	en, err := AesCBCEncodeHex(key, iv, value)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	result := "ae5d9a1e7e4260832cba80647b1e788d"
+	if en != result {
+		t.Errorf("AesCBCEncodeHex failed, en: %s", en)
+		return
+	}
+
+	en, err = AesCBCEncodeBase64(key, iv, value)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	result = "rl2aHn5CYIMsuoBkex54jQ=="
+	if en != result {
+		t.Errorf("AesCBCEncodeBase64 failed, en: %s", en)
+		return
+	}
+}
+
+func TestAesCBCDecode(t *testing.T) {
+	key := []byte("1234567890123456")
+	iv := []byte("1234567890123456")
+	value := []byte("abcdefg")
+
+	de, err := AesCBCDecodeHex(key, iv, "ae5d9a1e7e4260832cba80647b1e788d")
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	if !bytes.Equal(de, value) {
+		t.Errorf("AesCBCDecodeHex failed, de: %x", de)
+		return
+	}
+
+	de, err = AesCBCDecodeBase64(key, iv, "rl2aHn5CYIMsuoBkex54jQ==")
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	if !bytes.Equal(de, value) {
+		t.Errorf("AesCBCDecodeBase64 failed, de: %x", de)
+		return
 	}
 }
