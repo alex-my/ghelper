@@ -75,7 +75,7 @@ func IDGenerate(year, month, day, sex int, areaCode string, count int) ([]string
 
 	for i := 0; i < count; i++ {
 		// 三位数随机码，奇数分配给男性，偶数分配给女性
-		randomCode := random.RandomInt(100, 998)
+		randomCode := random.Int(100, 998)
 		if sex == 0 && randomCode%2 != 0 {
 			randomCode++
 		} else if sex == 1 && randomCode%2 == 0 {

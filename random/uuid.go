@@ -34,5 +34,5 @@ func NewUUID() string {
 func init() {
 	machineID = os.MachineID()
 	processID = os.ProcessID()
-	counter = RandomUint32()
+	counter = Uint32()
 }

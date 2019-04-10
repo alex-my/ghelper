@@ -16,7 +16,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetTimeout(t *testing.T) {
-	url := fmt.Sprintf("http://%s", random.RandomString(16))
+	url := fmt.Sprintf("http://%s", random.String(16))
 	t.Logf("url: %s", url)
 	_, err := Get(url, nil, nil, 3)
 	if err == nil {
@@ -25,7 +25,7 @@ func TestGetTimeout(t *testing.T) {
 }
 
 func TestGetRetry(t *testing.T) {
-	url := fmt.Sprintf("http://%s", random.RandomString(16))
+	url := fmt.Sprintf("http://%s", random.String(16))
 	t.Logf("url: %s", url)
 	_, err := GetRetry(url, nil, nil, 2, 3, 1000)
 	if err == nil {
@@ -34,7 +34,7 @@ func TestGetRetry(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	url := fmt.Sprintf("http://%s", random.RandomString(16))
+	url := fmt.Sprintf("http://%s", random.String(16))
 	_, err := Post(url, nil, nil, nil, 0)
 	if err == nil {
 		t.Errorf("Get failed: %s", err.Error())

@@ -40,7 +40,7 @@ func Name(_path string) string {
 // NameRand 获取一个随机文件名称
 func NameRand(_path string) string {
 	name := BaseName(_path)
-	return name + "-" + random.RandomString(12)
+	return name + "-" + random.String(12)
 }
 
 // BaseName 获取文件名，不带后缀

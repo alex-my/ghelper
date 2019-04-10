@@ -13,8 +13,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// RandomString 获取指定长度的字符串
-func RandomString(length int) string {
+// String 获取指定长度的字符串
+func String(length int) string {
 	rs := make([]string, length)
 	for start := 0; start < length; start++ {
 		t := rand.Intn(3)
@@ -29,16 +29,16 @@ func RandomString(length int) string {
 	return strings.Join(rs, "")
 }
 
-// RandomInt 获取指定范围内的整数
-func RandomInt(min, max int64) int64 {
+// Int 获取指定范围内的整数
+func Int(min, max int64) int64 {
 	if min >= max || min == max || min == 0 || max == 0 {
 		return max
 	}
 	return rand.Int63n(max-min) + min
 }
 
-// RandomUint32 获取随机数 uint32
-func RandomUint32() uint32 {
+// Uint32 获取随机数 uint32
+func Uint32() uint32 {
 	var v uint32
 	if err := binary.Read(_cr.Reader, binary.BigEndian, &v); err == nil {
 		return v
