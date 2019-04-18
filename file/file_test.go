@@ -5,11 +5,15 @@ import (
 )
 
 func TestFile(t *testing.T) {
-	filePath := "./utils_file_test.go"
+	filePath := "./file_test.go"
 	dirPath := "."
 
 	if !IsFile(filePath) {
 		t.Error("IsFile error")
+	}
+
+	if IsFile(dirPath) {
+		t.Error("IsFile error, dirPath")
 	}
 
 	if !IsDir(dirPath) {
@@ -18,6 +22,10 @@ func TestFile(t *testing.T) {
 
 	if IsExist("/hi/ROS9cRYp") {
 		t.Error("IsExist error")
+	}
+
+	if !IsExist(dirPath) {
+		t.Error("IsExist error, dirPath")
 	}
 }
 

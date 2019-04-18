@@ -2,7 +2,18 @@
 
 ## `API`文档
 
-- [ghelper](https://www.keylala.cn/ghelper)
+- [array 数组](./array.md)
+- [config 配置](./config.md)
+- [crypto 加密](./crypto.md)
+- [file 文件](./file.md)
+- [graceful 优雅重启和关闭服务器](./graceful.md)
+- [http HTTP 请求](./http.md)
+- [human 与人相关](./human.md)
+- [logger 日志](./logger.md)
+- [os 系统](./os.md)
+- [random 随机值/唯一值](./random.md)
+- [regexp 正则表达式](./regexp.md)
+- [time 时间，日期](./time.md)
 
 ## `TODO`
 
@@ -27,5 +38,6 @@
 - [x] random
 - [x] regexp
 - [ ] redis
+- [ ] template 模版渲染
 - [x] time
 - [ ] validate

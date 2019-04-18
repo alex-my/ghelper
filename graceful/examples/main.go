@@ -20,17 +20,13 @@ func main() {
 	addr := "127.0.0.1:8877"
 	logger := logger.NewLogger()
 
-	gserver, err := graceful.NewServer(server, logger)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
-
+	gserver := graceful.NewServer(server, logger)
 	logger.Infof("listen on: http://%s, pid: %d", addr, os.Getpid())
 
 	graceful.ListenSignal()
 
 	// 启动，接受连接
-	err = gserver.ListenAndServe(addr)
+	err := gserver.ListenAndServe(addr)
 	if err != nil {
 		if err == http.ErrServerClosed {
 			logger.Info("server closed")

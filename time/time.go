@@ -89,7 +89,7 @@ func Date(level int) string {
 	return time.Now().Format(format)
 }
 
-// Now 获取当前时间戳
+// Now 获取当前时间戳，秒
 // eg: Now() => 1543626923
 func Now() int64 {
 	return time.Now().Unix()

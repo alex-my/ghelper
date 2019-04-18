@@ -11,7 +11,7 @@ import (
 )
 
 // envNewKey 新创建的进程环境变量中拥有该标签
-var envNewKey = "newProcess"
+var envNewKey = "newProcess-JNnQ3s"
 
 // Server 替代 http.Server
 type Server struct {

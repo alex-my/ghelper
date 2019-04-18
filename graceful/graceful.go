@@ -86,7 +86,6 @@ func SetShutdownTimeout(timeout int) {
 // RegisterShutdownHandler 注册关闭函数
 // 按照注册的顺序调用这些函数
 // 所有已经添加的服务器都会响应这个函数
-// 如果要单独给指定的服务器添加 关闭函数，可以使用 WithShutdownHandler
 func RegisterShutdownHandler(f func()) error {
 	if gserver.server == nil {
 		return errors.New("use graceful.NewServer first")
@@ -97,7 +96,7 @@ func RegisterShutdownHandler(f func()) error {
 	return nil
 }
 
-// ListenSignal 监听信号，阻塞
+// ListenSignal 监听信号
 func ListenSignal() {
 	if len(gserver.restartSignals) == 0 {
 		gserver.restartSignals = []os.Signal{syscall.SIGUSR1, syscall.SIGUSR2}
@@ -165,8 +164,6 @@ func Close() {
 // 关闭监听
 // 执行之前注册的关闭函数(RegisterShutdownHandler)，可以用于清理资源等
 // 关闭空闲连接，等待激活的连接变为空闲，再关闭它
-//
-// timeout: 超时时间，不再等待激活连接变为空闲，直接关闭，系统每隔500毫秒检查一次，单位：秒
 func Shutdown() {
 	logger := gserver.logger
 	server := gserver.server

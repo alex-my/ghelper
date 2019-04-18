@@ -30,6 +30,9 @@ type Config interface {
 
 	// FileYAML 从 yaml 文件中读取配置
 	FileYAML(path string) error
+
+	// Any 根据 key 获取对应数据
+	Any(key string) (interface{}, error)
 }
 
 type config struct {
@@ -133,6 +136,14 @@ func (c *config) FileYAML(path string) error {
 	return c.LoadYAML(bytes)
 }
 
+// Any 根据 key 获取对应数据
+func (c *config) Any(key string) (interface{}, error) {
+	if value, exist := c.data[key]; exist {
+		return value, nil
+	}
+	return nil, errors.New("Configuration does not exist")
+}
+
 func checkInit() {
 	if defaultConfig == nil || !defaultConfig.init {
 		panic("Please call NewConfig initialization first, then call Loadxxx or Filexxx to load the data.")
@@ -142,10 +153,7 @@ func checkInit() {
 // Any 获取指定 key 对应的数据
 func Any(key string) (interface{}, error) {
 	checkInit()
-	if value, exist := defaultConfig.data[key]; exist {
-		return value, nil
-	}
-	return nil, errors.New("Configuration does not exist")
+	return defaultConfig.Any(key)
 }
 
 // C 获取配置
