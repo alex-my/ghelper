@@ -58,8 +58,8 @@ const (
 	ColorWhiteB = 47
 )
 
-// defaultLog 简单日志，输出到终端
-type defaultLog struct {
+// simpleLog 简单日志，输出到终端
+type simpleLog struct {
 	// able true: 开启日志，false 关闭日志
 	able bool
 
@@ -71,80 +71,80 @@ type defaultLog struct {
 }
 
 // NewLogger ..
-func NewLogger() Log {
-	return &defaultLog{able: true, console: true}
+func NewLogger() Logger {
+	return &simpleLog{able: true, console: true}
 }
 
 // Debug ..
-func (l *defaultLog) Debug(v ...interface{}) {
+func (l *simpleLog) Debug(v ...interface{}) {
 	l.log(DEBUG, v...)
 }
 
 // Debugf ..
-func (l *defaultLog) Debugf(format string, v ...interface{}) {
+func (l *simpleLog) Debugf(format string, v ...interface{}) {
 	l.logf(DEBUG, format, v...)
 }
 
 // Info ..
-func (l *defaultLog) Info(v ...interface{}) {
+func (l *simpleLog) Info(v ...interface{}) {
 	l.log(INFO, v...)
 }
 
 // Infof ..
-func (l *defaultLog) Infof(format string, v ...interface{}) {
+func (l *simpleLog) Infof(format string, v ...interface{}) {
 	l.logf(INFO, format, v...)
 }
 
 // Warn ..
-func (l *defaultLog) Warn(v ...interface{}) {
+func (l *simpleLog) Warn(v ...interface{}) {
 	l.log(WARN, v...)
 }
 
 // Warnf ..
-func (l *defaultLog) Warnf(format string, v ...interface{}) {
+func (l *simpleLog) Warnf(format string, v ...interface{}) {
 	l.logf(WARN, format, v...)
 }
 
 // Error ..
-func (l *defaultLog) Error(v ...interface{}) {
+func (l *simpleLog) Error(v ...interface{}) {
 	l.log(ERROR, v...)
 }
 
 // Errorf ..
-func (l *defaultLog) Errorf(format string, v ...interface{}) {
+func (l *simpleLog) Errorf(format string, v ...interface{}) {
 	l.logf(ERROR, format, v...)
 }
 
 // Fatal ..
-func (l *defaultLog) Fatal(v ...interface{}) {
+func (l *simpleLog) Fatal(v ...interface{}) {
 	l.log(FATAL, v...)
 	panic("")
 }
 
 // Fatalf ..
-func (l *defaultLog) Fatalf(format string, v ...interface{}) {
+func (l *simpleLog) Fatalf(format string, v ...interface{}) {
 	l.logf(FATAL, format, v...)
 	panic("")
 }
 
-// Enable 设置日志是否开启
+// SetEnable 设置日志是否开启
 // able: true 开启; false 关闭
-func (l *defaultLog) Enable(able bool) {
+func (l *simpleLog) SetEnable(able bool) {
 	l.able = able
 }
 
 // SetPath ..
-func (l *defaultLog) SetPath(path string) {
+func (l *simpleLog) SetPath(path string) {
 
 }
 
 // SetLevel ..
-func (l *defaultLog) SetLevel(level int) {
+func (l *simpleLog) SetLevel(level int) {
 	l.level = level
 }
 
 // SetConsoleEnable ..
-func (l *defaultLog) SetConsoleEnable(able bool) {
+func (l *simpleLog) SetConsoleEnable(able bool) {
 	// 本日志仅输出到终端
 	l.able = able
 	l.console = able
@@ -242,13 +242,13 @@ func runtimeMessage(level int) string {
 	return buff.String()
 }
 
-func (l *defaultLog) log(level int, v ...interface{}) {
+func (l *simpleLog) log(level int, v ...interface{}) {
 	if l.able && l.console && level >= l.level {
 		fmt.Println(runtimeMessage(level), fmt.Sprint(v...))
 	}
 }
 
-func (l *defaultLog) logf(level int, format string, v ...interface{}) {
+func (l *simpleLog) logf(level int, format string, v ...interface{}) {
 	if l.able && l.console && level >= l.level {
 		fmt.Println(runtimeMessage(level), fmt.Sprintf(format, v...))
 	}
