@@ -21,7 +21,7 @@ type Server struct {
 }
 
 // NewServer ..
-func NewServer(handler http.Handler, logger logger.Log) *Server {
+func NewServer(handler http.Handler, logger logger.Logger) *Server {
 	var tc tcpKeepAliveListener
 
 	// 结构体初始化: 如果匿名字段也要初始化，则采取不声明 key 的方式 或者都声明 key 的方式

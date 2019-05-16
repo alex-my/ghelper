@@ -29,7 +29,7 @@ type gracefulServer struct {
 	closeSignals []os.Signal
 
 	// log 日志
-	logger logger.Log
+	logger logger.Logger
 }
 
 var (
