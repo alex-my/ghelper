@@ -5,25 +5,31 @@ import (
 )
 
 func TestIntToString(t *testing.T) {
-	il := []int{1, 2, 3, 4}
-	dst := "1,2,3,4"
-	if IntToString(il) != dst {
+	if IntToString([]int{1, 2, 3, 4}) != "1,2,3,4" {
 		t.Error("IntToString err")
+	}
+
+	if IntToString([]int{1, 2, 3, 4}, "+") != "1+2+3+4" {
+		t.Error("IntToString err, +")
 	}
 }
 
 func TestInt64ToString(t *testing.T) {
-	il := []int64{1, 2, 3, 4}
-	dst := "1,2,3,4"
-	if Int64ToString(il) != dst {
+	if Int64ToString([]int64{1, 2, 3, 4}) != "1,2,3,4" {
 		t.Error("Int64ToString err")
+	}
+
+	if Int64ToString([]int64{1, 2, 3, 4}, "+") != "1+2+3+4" {
+		t.Error("Int64ToString err, +")
 	}
 }
 
 func TestStringToString(t *testing.T) {
-	il := []string{"1", "2", "3", "4"}
-	dst := "1,2,3,4"
-	if StringToString(il) != dst {
+	if StringToString([]string{"1", "2", "3", "4"}) != "1,2,3,4" {
 		t.Error("StringToString err")
+	}
+
+	if StringToString([]string{"1", "2", "3", "4"}, "+") != "1+2+3+4" {
+		t.Error("StringToString err, +")
 	}
 }

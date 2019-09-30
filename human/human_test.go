@@ -1,7 +1,6 @@
 package human
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -27,9 +26,8 @@ func TestIDInfo(t *testing.T) {
 }
 
 func TestIDGenerate(t *testing.T) {
-	codes, err := IDGenerate(1999, 10, 1, 1, "440106", 5)
+	_, err := IDGenerate(1999, 10, 1, 1, "440106", 5)
 	if err != nil {
 		t.Errorf("IDGenerate error: %s", err.Error())
 	}
-	fmt.Println(codes)
 }

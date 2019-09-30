@@ -1,7 +1,7 @@
 package crypto
 
 import (
-	"strings"
+	"bytes"
 	"testing"
 )
 
@@ -96,8 +96,7 @@ func TestHmacSha512(t *testing.T) {
 }
 
 func TestURLEncode(t *testing.T) {
-	// www.keylala.cn%3Fname%3Dalex%26age%3D18%26say%3D%E4%BD%A0%E5%A5%BD
-	if strings.ToLower(URLEncode("www.keylala.cn?name=alex&age=18&say=你好")) != "www.keylala.cn%3fname%3dalex%26age%3d18%26say%3d%e4%bd%a0%e5%a5%bd" {
+	if URLEncode("www.keylala.cn?name=alex&age=18&say=你好") != "www.keylala.cn%3Fname%3Dalex%26age%3D18%26say%3D%E4%BD%A0%E5%A5%BD" {
 		t.Error("URLEncode error")
 	}
 }
@@ -105,5 +104,77 @@ func TestURLEncode(t *testing.T) {
 func TestURLDecode(t *testing.T) {
 	if URLDecode("www.keylala.cn%3Fname%3Dalex%26age%3D18%26say%3D%E4%BD%A0%E5%A5%BD") != "www.keylala.cn?name=alex&age=18&say=你好" {
 		t.Error("URLDecode error")
+	}
+}
+
+func TestBase64Encode(t *testing.T) {
+	if Base64Encode("https://www.keylala.cn/json?str=hello world") != "aHR0cHM6Ly93d3cua2V5bGFsYS5jbi9qc29uP3N0cj1oZWxsbyB3b3JsZA==" {
+		t.Error("Base64Encode error")
+	}
+}
+
+func TestBase64Decode(t *testing.T) {
+	b, err := Base64Decode("aHR0cHM6Ly93d3cua2V5bGFsYS5jbi9qc29uP3N0cj1oZWxsbyB3b3JsZA==")
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+
+	if !bytes.Equal(b, []byte("https://www.keylala.cn/json?str=hello world")) {
+		t.Error("Base64Decode error")
+	}
+}
+
+func TestAesCBCEncode(t *testing.T) {
+	key := []byte("1234567890123456")
+	iv := []byte("1234567890123456")
+	value := []byte("abcdefg")
+
+	en, err := AesCBCEncodeHex(key, iv, value)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	result := "ae5d9a1e7e4260832cba80647b1e788d"
+	if en != result {
+		t.Errorf("AesCBCEncodeHex failed, en: %s", en)
+		return
+	}
+
+	en, err = AesCBCEncodeBase64(key, iv, value)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	result = "rl2aHn5CYIMsuoBkex54jQ=="
+	if en != result {
+		t.Errorf("AesCBCEncodeBase64 failed, en: %s", en)
+		return
+	}
+}
+
+func TestAesCBCDecode(t *testing.T) {
+	key := []byte("1234567890123456")
+	iv := []byte("1234567890123456")
+	value := []byte("abcdefg")
+
+	de, err := AesCBCDecodeHex(key, iv, "ae5d9a1e7e4260832cba80647b1e788d")
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	if !bytes.Equal(de, value) {
+		t.Errorf("AesCBCDecodeHex failed, de: %x", de)
+		return
+	}
+
+	de, err = AesCBCDecodeBase64(key, iv, "rl2aHn5CYIMsuoBkex54jQ==")
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	if !bytes.Equal(de, value) {
+		t.Errorf("AesCBCDecodeBase64 failed, de: %x", de)
+		return
 	}
 }

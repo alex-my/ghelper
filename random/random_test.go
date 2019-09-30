@@ -6,8 +6,8 @@ import (
 
 func TestRandom(t *testing.T) {
 	size := 10
-	r1 := RandomString(size)
-	r2 := RandomString(size)
+	r1 := String(size)
+	r2 := String(size)
 	t.Logf("r1: %s", r1)
 	t.Logf("r2: %s", r2)
 	if r1 == r2 {

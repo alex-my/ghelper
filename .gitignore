@@ -1,9 +1,3 @@
-.vscode
-vendor
-
-# log
-*.log
-
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -16,3 +10,9 @@ vendor
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+vendor
+.vscode
+
+# log
+*.log

@@ -11,8 +11,8 @@ const (
 	FATAL
 )
 
-// Log 日志接口
-type Log interface {
+// Logger 日志接口
+type Logger interface {
 	Debug(v ...interface{})
 	Debugf(format string, v ...interface{})
 	Info(v ...interface{})
@@ -26,9 +26,9 @@ type Log interface {
 	// Fatalf 最终调用 panic
 	Fatalf(format string, v ...interface{})
 
-	// Enable 设置日志是否开启
+	// SetEnable 设置日志是否开启
 	// able: true 开启; false 关闭
-	Enable(able bool)
+	SetEnable(able bool)
 
 	// SetPath 设置日志路径
 	SetPath(path string)
