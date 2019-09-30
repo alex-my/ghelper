@@ -16,6 +16,13 @@ import (
 	"github.com/alex-my/ghelper/time"
 )
 
+// eg:
+// 输出: 时间、进程号、文件名称、函数名称、日志级别
+// [2019-04-18 17:01:47.168][25432][server.go:97-core.(*server).Start][INFO] Framework Version: 0.1.0
+// [2019-04-18 17:01:47.168][25432][server.go:99-core.(*server).Start][INFO] PID: 25432
+// [2019-04-18 17:01:47.168][25432][router_method.go:113-core.(*methodRoute).output][DEBUG] Static, Method: GET, Path: /
+// [2019-04-18 17:01:47.168][25432][server.go:117-core.(*server).Start][DEBUG] Listen on: http://127.0.0.1:8090
+
 const (
 	// ColorBlackC 前景 黑色
 	ColorBlackC = 30

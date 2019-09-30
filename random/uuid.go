@@ -16,6 +16,9 @@ var (
 )
 
 // NewUUID 全局唯一标识符，12byte
+// 基于时间戳，主机信息，进程 ID 生成，每次调用值加 1，具有原子性
+// eg: NewUUID()   -> 5cb840f90a5dcd71e779ba64
+// eg: NewUUID()   -> 5cb840f90a5dcd71e779ba65
 func NewUUID() string {
 	b := make([]byte, 12)
 	// 1-4: Unix 时间戳

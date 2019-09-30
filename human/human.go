@@ -22,7 +22,23 @@ var (
 	remainder = []byte{'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'}
 )
 
-// IDAreas 获取全国 县以上行政区划代码，更新至 2019年1月
+// IDAreas 获取全国 县以上行政区划代码
+// 定期更新数据，具体见本目录下的 idcard.go
+// eg:
+// IDAreas() ->
+// {
+// 	"110000": "北京市",
+// 	"110101": "东城区",
+// 	"110102": "西城区",
+// 	...
+// 	"440000": "广东省",
+// 	"440100": "广州市",
+// 	"440103": "荔湾区",
+// 	"440104": "越秀区",
+// 	"440105": "海珠区",
+// 	"440106": "天河区",
+// 	...
+// }
 func IDAreas() map[string]string {
 	return areas
 }
@@ -38,6 +54,10 @@ func IDCheck(code string) bool {
 // IDInfo 解析出身份信息
 // code: 身份证号码
 // return: 身份证信息
+// eg:
+// (数据为虚构，如有巧合，实属意外)
+// IDInfo("440106199910017896")
+// -> {Code:440106199910017896 Province:广东省 City:广州市 County:天河区 Year:1999 Month:10 Day:1 Sex:1 SexName:Male}
 func IDInfo(code string) (*IDCard, error) {
 	idCard := &IDCard{Code: code}
 	if err := idCard.parse(); err != nil {
@@ -52,6 +72,9 @@ func IDInfo(code string) (*IDCard, error) {
 // areaCode 区域编码，所有区域可以通过 IDAreas() 获取
 // count 生成身份证个数
 // return 身份证信息
+// eg:
+// codes, err := IDGenerate(1999, 10, 1, 1, "440106", 5)
+// -> [440106199910016594 440106199910012155 440106199910013238 440106199910013959 440106199910019074]
 func IDGenerate(year, month, day, sex int, areaCode string, count int) ([]string, error) {
 	// 验证地域信息是否存在
 	if _, exist := areas[areaCode]; !exist {

@@ -20,7 +20,7 @@ type Server struct {
 	tc tcpKeepAliveListener
 }
 
-// NewServer ..
+// NewServer 生成服务器，用来替代 `http.Server`
 func NewServer(handler http.Handler, logger logger.Logger) *Server {
 	var tc tcpKeepAliveListener
 
@@ -35,7 +35,7 @@ func NewServer(handler http.Handler, logger logger.Logger) *Server {
 	return server
 }
 
-// ListenAndServe ..
+// ListenAndServe 用于替代 `http.Server.ListenAndServe`
 func (server *Server) ListenAndServe(addr string) error {
 	if addr == "" {
 		addr = ":http"
@@ -53,7 +53,7 @@ func (server *Server) ListenAndServe(addr string) error {
 	return server.Serve(server.tc)
 }
 
-// ListenAndServeTLS ..
+// ListenAndServeTLS 用于替代 `http.Server.ListenAndServeTLS`
 func (server *Server) ListenAndServeTLS(addr, certFile, keyFile string) error {
 	if addr == "" {
 		addr = ":https"

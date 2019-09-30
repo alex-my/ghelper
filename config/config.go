@@ -11,6 +11,26 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// eg:
+// import (
+// 	"github.com/alex-my/ghelper/config"
+// )
+//
+// c := config.NewConfig()
+// err := c.FileJSON("./test.json")
+// if err != nil {
+// 	return
+// }
+//
+// 使用配置的实例来获取配置
+// framework, _ := c.Any("framework")
+//
+// 如果只有一个配置实例，推荐使用 config.C, config.D 等辅助函数
+// version, _ := config.C("framework")
+//
+// 如果配置不存在，使用默认值
+// addr := config.D("addr", "127.0.0.1:8080")
+
 // Config 配置文件
 type Config interface {
 	// LoadJSON 从 bytes 数据中读取配置
@@ -44,14 +64,14 @@ type config struct {
 
 var defaultConfig *config
 
-// NewConfig 获取配置文件
+// NewConfig 生成一个配置文件实例
 func NewConfig() Config {
 	data := make(map[string]interface{})
 	defaultConfig = &config{data: data}
 	return defaultConfig
 }
 
-// LoadJSON 从 bytes 数据中读取配置
+// LoadJSON 从 bytes 数据中读取 JSON 配置
 func (c *config) LoadJSON(bytes []byte) error {
 	if bytes == nil {
 		return errors.New("Bytes cannot be empty")
@@ -66,7 +86,7 @@ func (c *config) LoadJSON(bytes []byte) error {
 	return nil
 }
 
-// LoadTOML 从 bytes 数据中读取配置
+// LoadTOML 从 bytes 数据中读取 TOML 配置
 func (c *config) LoadTOML(bytes []byte) error {
 	if bytes == nil {
 		return errors.New("Bytes cannot be empty")
@@ -81,7 +101,7 @@ func (c *config) LoadTOML(bytes []byte) error {
 	return nil
 }
 
-// LoadYAML 从 bytes 数据中读取配置
+// LoadYAML 从 bytes 数据中读取 YAML 配置
 func (c *config) LoadYAML(bytes []byte) error {
 	if bytes == nil {
 		return errors.New("Bytes cannot be empty")

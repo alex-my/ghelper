@@ -1,4 +1,4 @@
-# 说明
+## 说明
 
 - 优雅的重启和关闭服务器
 - 优雅的重启需要获取原进程监听套接字的文件描述符，所以不能直接使用`http.server`的`ListenAndServe`和`ListenAndServeTLS`
@@ -13,7 +13,7 @@
   - 新进程"继承"旧进程的 `os.Stdin, os.Stdout, os.Stderr` 三个文件描述符以及 `监听套接字` 的文件描述符
   - 旧进程优雅的关闭，监听新连接的工作由新进程接手
 
-# 示例 1
+## 示例 1
 
 本示例使用默认信号
 
@@ -66,7 +66,7 @@
   - 重启服务器: `kill -USR1 {pid} 或者 kill -USR2 {pid}`
   - 重启服务器后，我们发现，仍然可以访问网站。查看端口: `mac` 下 `lsof -i tcp:8877`
 
-# 示例 2
+## 示例 2
 
 在示例 1 中，使用了默认配置的信号，`SIGUSR1`，`SIGUSR2` 用于重启服务器，`SIGINT`，`SIGTERM` 用于关闭服务器。但在实际情况中，可能 `SIGUSR2` 被用户设置其它用途，比如`重载配置`。这里就需要用到自定义信号
 
@@ -128,60 +128,3 @@
     }
   }
   ```
-
-# API
-
-- **func NewServer(handler http.Handler, logger logger.Log) \*Server**
-
-  - 功能: 生成服务器，用来替代 `http.Server`
-  - 参数:
-    - **handler**: 与使用`http.Server`一致
-    - **logger**: 日志
-
-- **func (server \*Server) ListenAndServe(addr string) error**
-
-  - 功能: 用于替代 `http.Server.ListenAndServe`
-  - 参数:
-    - **addr**: 监听地址，例如 `:8080`，`localhost:8080`
-
-- **func (server \*Server) ListenAndServeTLS(addr, certFile, keyFile string) error**
-
-  - 功能: 用于替代 `http.Server.ListenAndServeTLS`
-  - 参数:
-    - **addr**: 监听地址，例如 `:8080`，`localhost:8080`
-    - **certFile**: 证书路径
-    - **keyFile**: 私钥路径
-
-- **func RegisterRestartSignal(sig ...os.Signal) error**
-
-  - 功能: 设置重启服务器信号，不设置时默认为 `syscall.SIGUSR1, syscall.SIGUSR2`
-
-- **func RegisterCloseSignal(sig ...os.Signal) error**
-
-  - 功能: 设置关闭服务器信号，不设置时默认为 `syscall.SIGINT, syscall.SIGTERM`
-
-- **func SetShutdownTimeout(timeout int)**
-
-  - 功能: 设置超时时间，默认为 `5` 秒 服务器会每隔 500 毫秒检查一次所有连接是否都处理完毕，直到超时时间触发
-  - 参数:
-    - **timeout**: 超时时间，单位秒
-
-- **func RegisterShutdownHandler(f func()) error**
-
-  - 功能: 设置清理函数，服务器在关闭监听之后，关闭连接之前会调用这些函数，按照注册的顺序调用，先进先出
-
-- **func ListenSignal()**
-
-  - 功能: 监听关闭服务器和重启服务器的信号
-
-- **func Close()**
-
-  - 功能: 直接关闭服务器
-
-- **func Shutdown()**
-
-  - 功能: 优雅的关闭服务器
-
-- **func Restart()**
-
-  - 功能: 优雅的重启服务器
