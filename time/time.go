@@ -18,6 +18,15 @@ func Sleep(sleepSecond int) {
 	time.Sleep(time.Duration(sleepSecond) * time.Second)
 }
 
+// SleepMS 暂停
+// sleepMS: 暂停毫秒数
+func SleepMS(sleepMS int) {
+	if sleepMS <= 0 {
+		return
+	}
+	time.Sleep(time.Duration(sleepMS) * time.Microsecond)
+}
+
 // Second 设置秒
 func Second(second int) time.Duration {
 	return time.Duration(second) * time.Second
@@ -89,10 +98,20 @@ func Date(level int) string {
 	return time.Now().Format(format)
 }
 
-// Now 获取当前时间戳
+// Now 获取当前时间戳 秒
 // eg: Now() => 1543626923
 func Now() int64 {
 	return time.Now().Unix()
+}
+
+// MS 获取当前 毫秒
+func MS() int64 {
+	return time.Now().UnixNano() / 1e6
+}
+
+// Nano 获取当前 纳秒
+func Nano() int64 {
+	return time.Now().UnixNano()
 }
 
 // Str2Now 将字符串转为时间戳
