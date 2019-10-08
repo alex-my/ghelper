@@ -1,4 +1,6 @@
-## 依赖
+## ghelper
+
+golang 辅助库
 
 ## TODO
 
@@ -9,6 +11,7 @@
 - [x] config
 - [ ] convert
 - [x] crypto
+- [x] email
 - [x] file
 - [ ] fuse 熔断器
 - [x] graceful 优雅关闭/重启
