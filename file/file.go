@@ -1,7 +1,9 @@
 package file
 
 import (
+	"bufio"
 	"bytes"
+	"io"
 	"os"
 	_path "path"
 	"path/filepath"
@@ -106,4 +108,40 @@ func BaseName(path string) string {
 // eg: ExtensionName("/tmp/test.txt") 	-> .txt
 func ExtensionName(path string) string {
 	return _path.Ext(path)
+}
+
+// ReadLine 逐行读取文件、读取大文件
+// path: 文件路径
+// handle: 每读取一行的处理函数，返回的error为非nil时，不再继续向后读取
+func ReadLine(path string, handle func([]byte) error) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+
+	for {
+		line, isPrefix, err := reader.ReadLine()
+
+		// isPrefix 一行太长了，需要多次调用，默认一行为 4096 字节
+		// 也可以修改 bufio.NewReader 为 bufio.NewReaderSize 自行修改默认一行的长度
+		for isPrefix && err == nil {
+			var bs []byte
+			bs, isPrefix, err = reader.ReadLine()
+			line = append(line, bs...)
+		}
+
+		if err := handle(line); err != nil {
+			return err
+		}
+
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+	}
 }
