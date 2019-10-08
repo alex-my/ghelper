@@ -3,6 +3,12 @@ package file
 import (
 	"bufio"
 	"bytes"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
+	"hash"
 	"io"
 	"os"
 	_path "path"
@@ -144,4 +150,38 @@ func ReadLine(path string, handle func([]byte) error) error {
 			return err
 		}
 	}
+}
+
+// Md5 计算文件 md5 值
+func Md5(path string) (string, error) {
+	return calcHash(path, md5.New())
+}
+
+// Sha1 计算文件 sha1 值
+func Sha1(path string) (string, error) {
+	return calcHash(path, sha1.New())
+}
+
+// Sha256 计算文件 sha256 值
+func Sha256(path string) (string, error) {
+	return calcHash(path, sha256.New())
+}
+
+// Sha512 计算文件 sha512 值
+func Sha512(path string) (string, error) {
+	return calcHash(path, sha512.New())
+}
+
+func calcHash(path string, h hash.Hash) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(h, file); err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
