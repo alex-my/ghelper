@@ -185,3 +185,13 @@ func calcHash(path string, h hash.Hash) (string, error) {
 
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
+
+// Size 获取文件长度
+func Size(path string) (int64, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return 0, err
+	}
+
+	return info.Size(), nil
+}
