@@ -27,7 +27,7 @@ type logrusLog struct {
 // maxAge: 日志保留时间，例如 180*24*time.Hour，保留 180 天
 // rotationTime: 日志切割时间，例如 24*time.Hour 每天切割一次
 func NewLogrusLogger(logName, logPath string, caller, json bool, maxAge, rotationTime time.Duration) (Logger, error) {
-	basePath := path.Join(logName, logPath)
+	basePath := path.Join(logPath, logName)
 
 	writer, err := rotatelogs.New(
 		basePath+".%Y%m%d.log",
