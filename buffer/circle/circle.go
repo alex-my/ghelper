@@ -268,13 +268,13 @@ func (c *Circle) ReadN(n int, p []byte) error {
 
 // Peek 读取 n 个长度的内容，但不会产生任何影响
 // 不会改变 c.read 和 c.write
-func (c *Circle) Peek(n int, p []byte) error {
+func (c *Circle) Peek(n int) ([]byte, error) {
 	write, read := c.write, c.read
 
-	err := c.ReadN(n, p)
+	p, err := c.Get(n)
 	c.write, c.read = write, read
 
-	return err
+	return p, err
 }
 
 // Skip 跳过 n 个字段，会改变 c.read

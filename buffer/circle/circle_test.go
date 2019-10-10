@@ -156,8 +156,7 @@ func TestCirclePeek(t *testing.T) {
 	c := circle.New(10)
 	c.Write([]byte("0123456789"))
 
-	buffer := make([]byte, 5)
-	err := c.Peek(5, buffer)
+	_, err := c.Peek(5)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
