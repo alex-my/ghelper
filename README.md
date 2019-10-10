@@ -18,6 +18,7 @@ golang 辅助库
 - [x] graceful 优雅关闭/重启
 - [x] human
 - [x] http
+- [x] ip
 - [ ] jwt
 - [ ] limiter 限流器
 - [x] logger 简单的日志
