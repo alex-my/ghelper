@@ -16,6 +16,12 @@ var (
 	ErrInvalidBuffer = errors.New("invalid buffer")
 	// ErrNotEnough 数据不足以读取长度 n 的内容
 	ErrNotEnough = errors.New("not enough data")
+	// ErrInvalidSkipSize 无效的长度
+	ErrInvalidSkipSize = errors.New("invalid skip size")
+	// ErrIsFull 缓冲区已满
+	ErrIsFull = errors.New("buffer is full")
+	// ErrIsEmpty 缓冲区已满
+	ErrIsEmpty = errors.New("buffer is empty")
 )
 
 // Circle 环形结构
@@ -25,6 +31,7 @@ type Circle struct {
 	size  int
 
 	buffer []byte
+	isFull bool
 }
 
 // New 创建环形结构
@@ -38,12 +45,24 @@ func New(size int) *Circle {
 		read:   0,
 		size:   size,
 		buffer: make([]byte, size),
+		isFull: false,
 	}
+}
+
+// Reset 重置
+func (c *Circle) Reset() {
+	c.write = 0
+	c.read = 0
+	c.isFull = false
 }
 
 // Len 有效 buffer 的长度
 func (c *Circle) Len() int {
 	// read 到 write 中间存储着有效的 buffer
+
+	if c.isFull {
+		return c.size
+	}
 
 	// |___read______write____|
 	if c.write >= c.read {
@@ -69,6 +88,10 @@ func (c *Circle) Free() int {
 func (c *Circle) Write(p []byte) (int, error) {
 	if p == nil || len(p) == 0 {
 		return 0, nil
+	}
+
+	if c.isFull {
+		return 0, ErrIsFull
 	}
 
 	free := c.Free()
@@ -105,9 +128,9 @@ func (c *Circle) Write(p []byte) (int, error) {
 		c.write += lenp
 	}
 
-	// if c.write == c.size {
-	// 	c.write = 0
-	// }
+	if c.write == c.read {
+		c.isFull = true
+	}
 
 	return lenp, nil
 }
@@ -121,8 +144,8 @@ func (c *Circle) Read(p []byte) (int, error) {
 	}
 
 	// 没有内容
-	if c.write == c.read {
-		return 0, nil
+	if c.IsEmpty() {
+		return 0, ErrIsEmpty
 	}
 
 	lenp := len(p)
@@ -143,10 +166,11 @@ func (c *Circle) Read(p []byte) (int, error) {
 		// read 向前移动
 		c.read += readToWrite
 
+		c.isFull = false
 		return readToWrite, nil
 	}
 
-	// c.write < c.read
+	// c.write <= c.read
 	// start|___write______read____|end
 	// 可以读取两部分数据
 	// 第一部分 read 到 end
@@ -182,6 +206,7 @@ func (c *Circle) Read(p []byte) (int, error) {
 		c.read = left
 	}
 
+	c.isFull = false
 	return canReadLen, nil
 }
 
@@ -212,14 +237,60 @@ func (c *Circle) Peek(n int, p []byte) error {
 	return err
 }
 
+// Skip 跳过 n 个字段，会改变 c.read
+func (c *Circle) Skip(n int) error {
+	if n <= 0 {
+		return nil
+	}
+
+	if c.IsEmpty() {
+		return ErrIsEmpty
+	}
+
+	// start|___read______write____|end
+	if c.write > c.read {
+		if c.read+n > c.write {
+			return ErrInvalidSkipSize
+		}
+
+		c.read += n
+	} else {
+		// c.write <= c.read
+		// start|___write______read____|end
+		if c.read+n <= c.size {
+			c.read += n
+		} else {
+			left := n - (c.size - c.read)
+			if left > c.write {
+				return ErrInvalidSkipSize
+			}
+
+			c.read = left
+		}
+	}
+
+	c.isFull = false
+	return nil
+}
+
+// IsEmpty 缓冲区是否为空
+func (c *Circle) IsEmpty() bool {
+	return !c.isFull && c.write == c.read
+}
+
+// IsFull 缓冲区是否已满
+func (c *Circle) IsFull() bool {
+	return c.isFull
+}
+
 func (c *Circle) String() string {
 	if c.write >= c.read {
-		return fmt.Sprintf("read: %d, write: %d, size: %d, len: %d, free: %d, buffer: %v",
-			c.read, c.write, c.size, c.Len(), c.Free(), c.buffer,
+		return fmt.Sprintf("read: %d, write: %d, size: %d, len: %d, free: %d, isFull: %t, buffer: %v",
+			c.read, c.write, c.size, c.Len(), c.Free(), c.isFull, c.buffer,
 		)
 	}
 
-	return fmt.Sprintf("write: %d, read: %d, size: %d, len: %d, free: %d, buffer: %v",
-		c.write, c.read, c.size, c.Len(), c.Free(), c.buffer,
+	return fmt.Sprintf("write: %d, read: %d, size: %d, len: %d, free: %d, isFull: %t, buffer: %v",
+		c.write, c.read, c.size, c.Len(), c.Free(), c.isFull, c.buffer,
 	)
 }

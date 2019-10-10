@@ -30,6 +30,34 @@ func TestCircleWrite(t *testing.T) {
 	}
 }
 
+func TestCircleWrite2(t *testing.T) {
+	c := circle.New(10)
+	c.Write([]byte("0123456789"))
+	c.Skip(5)
+	if _, err := c.Write([]byte("abcde")); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+	if !c.IsFull() {
+		t.Fatal("c.IsFull must be true")
+	}
+
+	buffer := make([]byte, 3)
+	_, err := c.Read(buffer)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := c.Write([]byte("fgh")); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+	if err := c.Skip(2); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+}
+
 func TestCircleRead(t *testing.T) {
 	c := circle.New(10)
 	c.Write([]byte("01234"))
@@ -131,6 +159,44 @@ func TestCirclePeek(t *testing.T) {
 	buffer := make([]byte, 5)
 	err := c.Peek(5, buffer)
 	if err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestCircleSkip1(t *testing.T) {
+	c := circle.New(10)
+	if err := c.Skip(1); err != circle.ErrIsEmpty {
+		t.Fatal(err.Error())
+	}
+
+	c.Write([]byte("0123456789"))
+
+	if err := c.Skip(6); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+
+	c.Write([]byte("abcde"))
+	if err := c.Skip(3); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+
+	if err := c.Skip(3); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+}
+
+func TestCircleSkip2(t *testing.T) {
+	c := circle.New(10)
+	c.Write([]byte("0123456789"))
+	if err := c.Skip(10); err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+	if err := c.Skip(1); err != circle.ErrIsEmpty {
+		t.Log(c)
 		t.Fatal(err.Error())
 	}
 }
