@@ -1,6 +1,9 @@
 package circle
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // 环形缓冲区
 // 实现了 io.Reader, io.Writer, io.ReadWriter 接口
@@ -63,7 +66,7 @@ func (c *Circle) Free() int {
 
 // Write 写入数据
 // 只有全部写入，或者都不写入两种情况，不存在只写入一部分的情形
-func (c *Circle) Write(p []byte) (n int, err error) {
+func (c *Circle) Write(p []byte) (int, error) {
 	if p == nil || len(p) == 0 {
 		return 0, nil
 	}
@@ -102,9 +105,9 @@ func (c *Circle) Write(p []byte) (n int, err error) {
 		c.write += lenp
 	}
 
-	if c.write == c.size {
-		c.write = 0
-	}
+	// if c.write == c.size {
+	// 	c.write = 0
+	// }
 
 	return lenp, nil
 }
@@ -112,7 +115,7 @@ func (c *Circle) Write(p []byte) (n int, err error) {
 // Read 读取尽量多的数据到 p 中
 // p: 数据会拷贝到 p 中
 // n: 读取到 P 中的数据长度
-func (c *Circle) Read(p []byte) (n int, err error) {
+func (c *Circle) Read(p []byte) (int, error) {
 	if p == nil || len(p) == 0 {
 		return 0, ErrInvalidBuffer
 	}
@@ -196,4 +199,16 @@ func (c *Circle) ReadN(n int, p []byte) error {
 
 	_, err := c.Read(p[:n])
 	return err
+}
+
+func (c *Circle) String() string {
+	if c.write >= c.read {
+		return fmt.Sprintf("read: %d, write: %d, size: %d, len: %d, free: %d, buffer: %v",
+			c.read, c.write, c.size, c.Len(), c.Free(), c.buffer,
+		)
+	}
+
+	return fmt.Sprintf("write: %d, read: %d, size: %d, len: %d, free: %d, buffer: %v",
+		c.write, c.read, c.size, c.Len(), c.Free(), c.buffer,
+	)
 }
