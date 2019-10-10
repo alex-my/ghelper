@@ -17,4 +17,7 @@ vendor
 # log
 *.log
 
+*.pdf
+*.svg
+
 main.go

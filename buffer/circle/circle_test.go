@@ -133,3 +133,43 @@ func TestCircleReadN(t *testing.T) {
 	}
 	t.Log(c, buffer)
 }
+
+// go tool pprof circle.test profile_cpu.out
+
+// go test -test.bench="BenchmarkWriteAndRead1" -benchtime=5s -cpuprofile profile_cpu.out
+// BenchmarkWriteAndRead1-12
+// 446801310	        13.2 ns/op	       0 B/op	       0 allocs/op
+// PASS
+// ok  	github.com/alex-my/ghelper/buffer/circle	7.452s
+func BenchmarkWriteAndRead1(b *testing.B) {
+	b.ReportAllocs()
+
+	c := circle.New(10)
+	buffer := make([]byte, 5)
+
+	for i := 0; i < b.N; i++ {
+		c.Write([]byte("12345"))
+		c.Read(buffer)
+	}
+}
+
+// go test -test.bench="BenchmarkWriteAndRead2" -benchtime=5s -cpuprofile profile_cpu.out
+// BenchmarkWriteAndRead2-12
+// 208808558	        28.6 ns/op	       0 B/op	       0 allocs/op
+// PASS
+// ok  	github.com/alex-my/ghelper/buffer/circle	9.072s
+func BenchmarkWriteAndRead2(b *testing.B) {
+	b.ReportAllocs()
+
+	c := circle.New(10)
+	buffer1 := make([]byte, 5)
+	buffer2 := make([]byte, 7)
+
+	for i := 0; i < b.N; i++ {
+		c.Write([]byte("1234567"))
+		c.Read(buffer1)
+
+		c.Write([]byte("89012"))
+		c.Read(buffer2)
+	}
+}
