@@ -9,7 +9,6 @@ import (
 func TestCircleWrite(t *testing.T) {
 	c := circle.New(10)
 	n, err := c.Write([]byte("01234"))
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -18,7 +17,6 @@ func TestCircleWrite(t *testing.T) {
 	}
 
 	_, err = c.Write([]byte("56789"))
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -39,7 +37,6 @@ func TestCircleRead(t *testing.T) {
 	// 只读取部分
 	buffer := make([]byte, 3)
 	n, err := c.Read(buffer)
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -56,7 +53,6 @@ func TestCircleRead(t *testing.T) {
 	// 将剩余部分全部读取
 	buffer = make([]byte, 10)
 	n, err = c.Read(buffer)
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -70,12 +66,10 @@ func TestCircleFull(t *testing.T) {
 
 	// 写入 9 个数据
 	c.Write([]byte("012345678"))
-	t.Log(c)
 
 	// 先读取 8 个数据，还剩下 1 个数据
 	buffer := make([]byte, 8)
 	n, err := c.Read(buffer)
-	t.Log(c, buffer)
 
 	if err != nil {
 		t.Fatal(err.Error())
@@ -86,7 +80,6 @@ func TestCircleFull(t *testing.T) {
 
 	// 写入 5 个数据
 	n, err = c.Write([]byte("abcde"))
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -97,7 +90,6 @@ func TestCircleFull(t *testing.T) {
 	// 读取 5 个数据
 	buffer = make([]byte, 5)
 	n, err = c.Read(buffer)
-	t.Log(c, buffer)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -107,7 +99,6 @@ func TestCircleFull(t *testing.T) {
 
 	// 写入 8 个数据
 	n, err = c.Write([]byte("fghijklm"))
-	t.Log(c)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -131,7 +122,17 @@ func TestCircleReadN(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	t.Log(c, buffer)
+}
+
+func TestCirclePeek(t *testing.T) {
+	c := circle.New(10)
+	c.Write([]byte("0123456789"))
+
+	buffer := make([]byte, 5)
+	err := c.Peek(5, buffer)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 }
 
 // go tool pprof circle.test profile_cpu.out

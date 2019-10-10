@@ -201,6 +201,17 @@ func (c *Circle) ReadN(n int, p []byte) error {
 	return err
 }
 
+// Peek 读取 n 个长度的内容，但不会产生任何影响
+// 不会改变 c.read 和 c.write
+func (c *Circle) Peek(n int, p []byte) error {
+	write, read := c.write, c.read
+
+	err := c.ReadN(n, p)
+	c.write, c.read = write, read
+
+	return err
+}
+
 func (c *Circle) String() string {
 	if c.write >= c.read {
 		return fmt.Sprintf("read: %d, write: %d, size: %d, len: %d, free: %d, buffer: %v",
