@@ -5,8 +5,8 @@ golang 辅助库
 ## TODO
 
 - [x] array
-- [ ] bit
 - [x] buffer
+- [x] bytes
 - [ ] captcha
 - [x] compress 压缩
 - [x] config
