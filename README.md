@@ -6,6 +6,7 @@ golang 辅助库
 
 - [x] array
 - [ ] bit
+- [x] buffer
 - [ ] captcha
 - [x] compress 压缩
 - [x] config
