@@ -201,6 +201,20 @@ func TestCircleSkip2(t *testing.T) {
 	}
 }
 
+func TestCircleGet(t *testing.T) {
+	c := circle.New(10)
+	c.Write([]byte("0123456789"))
+	t.Log(c)
+
+	b, err := c.Get(3)
+	if err != nil {
+		t.Log(c)
+		t.Fatal(err.Error())
+	}
+	t.Log(c)
+	t.Log(b)
+}
+
 // go tool pprof circle.test profile_cpu.out
 
 // go test -test.bench="BenchmarkWriteAndRead1" -benchtime=5s -cpuprofile profile_cpu.out

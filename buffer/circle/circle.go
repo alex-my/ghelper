@@ -22,6 +22,8 @@ var (
 	ErrIsFull = errors.New("buffer is full")
 	// ErrIsEmpty 缓冲区已满
 	ErrIsEmpty = errors.New("buffer is empty")
+	// ErrInvalidLength 无效长度
+	ErrInvalidLength = errors.New("invalid length")
 )
 
 // Circle 环形结构
@@ -30,8 +32,9 @@ type Circle struct {
 	read  int
 	size  int
 
-	buffer []byte
-	isFull bool
+	buffer     []byte
+	copyBuffer []byte
+	isFull     bool
 }
 
 // New 创建环形结构
@@ -41,11 +44,12 @@ func New(size int) *Circle {
 	}
 
 	return &Circle{
-		write:  0,
-		read:   0,
-		size:   size,
-		buffer: make([]byte, size),
-		isFull: false,
+		write:      0,
+		read:       0,
+		size:       size,
+		buffer:     make([]byte, size),
+		copyBuffer: make([]byte, size),
+		isFull:     false,
 	}
 }
 
@@ -60,7 +64,7 @@ func (c *Circle) Reset() {
 func (c *Circle) Len() int {
 	// read 到 write 中间存储着有效的 buffer
 
-	if c.isFull {
+	if c.IsFull() {
 		return c.size
 	}
 
@@ -90,7 +94,7 @@ func (c *Circle) Write(p []byte) (int, error) {
 		return 0, nil
 	}
 
-	if c.isFull {
+	if c.IsFull() {
 		return 0, ErrIsFull
 	}
 
@@ -135,6 +139,44 @@ func (c *Circle) Write(p []byte) (int, error) {
 	return lenp, nil
 }
 
+// Get 获取缓冲中的数据
+func (c *Circle) Get(n int) ([]byte, error) {
+	if n <= 0 {
+		return nil, ErrInvalidLength
+	}
+
+	// 没有内容
+	if c.IsEmpty() {
+		return nil, ErrIsEmpty
+	}
+
+	if n > c.Len() {
+		return nil, ErrInvalidLength
+	}
+
+	// start|___read______write____|end
+	if c.write > c.read {
+		c.read += n
+		return c.buffer[c.read-n : c.read], nil
+	}
+
+	// c.write <= c.read
+	// start|___write______read____|end
+
+	if c.read+n <= c.size {
+		c.read += n
+		return c.buffer[c.read-n : c.read], nil
+	}
+
+	// 拷贝两部分
+	copy(c.copyBuffer, c.buffer[c.read:])
+	left := n - (c.size - c.read)
+	copy(c.copyBuffer[c.size-c.read:], c.buffer[:left])
+
+	c.read = left
+	return c.copyBuffer[:n], nil
+}
+
 // Read 读取尽量多的数据到 p 中
 // p: 数据会拷贝到 p 中
 // n: 读取到 P 中的数据长度
@@ -157,7 +199,7 @@ func (c *Circle) Read(p []byte) (int, error) {
 		readToWrite := c.write - c.read
 
 		if readToWrite > lenp {
-			// p 存储不下，只能拷贝部分
+			// p 存储不下全部，只能拷贝部分
 			readToWrite = lenp
 		}
 
@@ -166,7 +208,6 @@ func (c *Circle) Read(p []byte) (int, error) {
 		// read 向前移动
 		c.read += readToWrite
 
-		c.isFull = false
 		return readToWrite, nil
 	}
 
@@ -206,7 +247,6 @@ func (c *Circle) Read(p []byte) (int, error) {
 		c.read = left
 	}
 
-	c.isFull = false
 	return canReadLen, nil
 }
 
@@ -269,7 +309,6 @@ func (c *Circle) Skip(n int) error {
 		}
 	}
 
-	c.isFull = false
 	return nil
 }
 
@@ -280,17 +319,17 @@ func (c *Circle) IsEmpty() bool {
 
 // IsFull 缓冲区是否已满
 func (c *Circle) IsFull() bool {
-	return c.isFull
+	return c.isFull && c.write == c.read
 }
 
 func (c *Circle) String() string {
 	if c.write >= c.read {
 		return fmt.Sprintf("read: %d, write: %d, size: %d, len: %d, free: %d, isFull: %t, buffer: %v",
-			c.read, c.write, c.size, c.Len(), c.Free(), c.isFull, c.buffer,
+			c.read, c.write, c.size, c.Len(), c.Free(), c.IsFull(), c.buffer,
 		)
 	}
 
 	return fmt.Sprintf("write: %d, read: %d, size: %d, len: %d, free: %d, isFull: %t, buffer: %v",
-		c.write, c.read, c.size, c.Len(), c.Free(), c.isFull, c.buffer,
+		c.write, c.read, c.size, c.Len(), c.Free(), c.IsFull(), c.buffer,
 	)
 }
