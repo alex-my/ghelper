@@ -139,6 +139,16 @@ func (c *Circle) Write(p []byte) (int, error) {
 	return lenp, nil
 }
 
+// WriteN 写入长度为 n 的数据
+func (c *Circle) WriteN(p []byte, n int) error {
+	if len(p) < n {
+		return ErrInvalidLength
+	}
+
+	_, err := c.Write(p[:n])
+	return err
+}
+
 // Get 获取缓冲中的数据
 func (c *Circle) Get(n int) ([]byte, error) {
 	if n <= 0 {
