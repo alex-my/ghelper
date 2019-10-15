@@ -33,3 +33,24 @@ func ToString(n uint32) string {
 	ip[3] = byte(n & 0xFF)
 	return ip.String()
 }
+
+// GetLocalAddr 获取本地地址，只限 ipv4
+func GetLocalAddr() ([]string, error) {
+	addrs, err := net.InterfaceAddrs()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var out []string
+
+	for _, addr := range addrs {
+		if n, ok := addr.(*net.IPNet); ok && !n.IP.IsLoopback() {
+			if n.IP.To4() != nil /** || n.IP.To16() != nil */ {
+				out = append(out, n.IP.String())
+			}
+		}
+	}
+
+	return out, nil
+}
