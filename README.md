@@ -8,6 +8,7 @@ golang 辅助库
 - [x] buffer
 - [x] bytes
 - [ ] captcha
+- [x] codec 编码与解码器
 - [x] compress 压缩
 - [x] config
 - [ ] convert
