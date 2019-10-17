@@ -23,12 +23,13 @@ golang 辅助库
 - [ ] limiter 限流器
 - [x] logger 简单的日志
 - [ ] mysql
-- [ ] net
+- [ ] network
 - [x] os
 - [ ] rbac 用于角色的权限访问控制
 - [x] random
 - [x] regexp
 - [ ] redis
+- [ ] rpc
 - [ ] template 模版渲染
 - [x] time
 - [ ] validate
