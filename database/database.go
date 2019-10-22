@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 
 	"fmt"
@@ -16,7 +15,7 @@ import (
 type Database interface {
 	config() *config
 	Open() error
-	DB() *sql.DB
+	DB() *gorm.DB
 	AutoMigrate(values ...interface{}) Database
 	Close()
 }
@@ -78,9 +77,9 @@ func (d *database) Open() error {
 	return nil
 }
 
-// DB 获取当前与数据库连接中的 DB，如果未连接，返回 nil
-func (d *database) DB() *sql.DB {
-	return d.db.DB()
+// DB ..
+func (d *database) DB() *gorm.DB {
+	return d.db
 }
 
 // AutoMigrate 迁移
