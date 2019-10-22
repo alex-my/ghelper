@@ -1,6 +1,6 @@
 package database
 
-// Config 配置文件
+// config 配置文件
 type config struct {
 	username     string
 	password     string
