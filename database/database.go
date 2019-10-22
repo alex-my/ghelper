@@ -73,6 +73,8 @@ func (d *database) Open() error {
 	// 使用 TableName 设置的除外
 	db.SingularTable(true)
 
+	d.db = db
+
 	return nil
 }
 
