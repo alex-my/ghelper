@@ -21,8 +21,8 @@ type Database interface {
 }
 
 type database struct {
-	c  *config
-	db *gorm.DB
+	conf *config
+	db   *gorm.DB
 }
 
 // NewDatabase ..
@@ -32,7 +32,7 @@ func NewDatabase(opts ...Option) Database {
 
 func newDatabase(opts ...Option) Database {
 	d := &database{
-		c: defaultConfig(),
+		conf: defaultConfig(),
 	}
 
 	for _, opt := range opts {
@@ -44,7 +44,7 @@ func newDatabase(opts ...Option) Database {
 
 // config ..
 func (d *database) config() *config {
-	return d.c
+	return d.conf
 }
 
 // Open ..
@@ -54,20 +54,20 @@ func (d *database) Open() error {
 		return err
 	}
 
-	db, err := gorm.Open(d.c.dialect, url)
+	db, err := gorm.Open(d.conf.dialect, url)
 	if err != nil {
 		return err
 	}
 
-	if d.c.logDebug {
+	if d.conf.logDebug {
 		db.LogMode(true)
 	}
 
-	if d.c.maxIdleConns > 0 {
-		db.DB().SetMaxIdleConns(d.c.maxIdleConns)
+	if d.conf.maxIdleConns > 0 {
+		db.DB().SetMaxIdleConns(d.conf.maxIdleConns)
 	}
-	if d.c.maxOpenConns > 0 {
-		db.DB().SetMaxOpenConns(d.c.maxOpenConns)
+	if d.conf.maxOpenConns > 0 {
+		db.DB().SetMaxOpenConns(d.conf.maxOpenConns)
 	}
 
 	// 表名默认不使用复用形式，比如表名使用 user 而不是 users
@@ -88,10 +88,10 @@ func (d *database) Close() {
 }
 
 func (d *database) url() (string, error) {
-	c := d.c
+	c := d.conf
 	s := ""
 
-	switch d.c.dialect {
+	switch d.conf.dialect {
 	case "mysql":
 		s = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 			c.username, c.password, c.host, c.port, c.dbname)
