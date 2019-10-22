@@ -17,6 +17,7 @@ type Database interface {
 	config() *config
 	Open() error
 	DB() *sql.DB
+	AutoMigrate(values ...interface{}) Database
 	Close()
 }
 
@@ -59,9 +60,7 @@ func (d *database) Open() error {
 		return err
 	}
 
-	if d.conf.logDebug {
-		db.LogMode(true)
-	}
+	db.LogMode(d.conf.logDebug)
 
 	if d.conf.maxIdleConns > 0 {
 		db.DB().SetMaxIdleConns(d.conf.maxIdleConns)
@@ -80,6 +79,12 @@ func (d *database) Open() error {
 // DB 获取当前与数据库连接中的 DB，如果未连接，返回 nil
 func (d *database) DB() *sql.DB {
 	return d.db.DB()
+}
+
+// AutoMigrate 迁移
+func (d *database) AutoMigrate(values ...interface{}) Database {
+	d.db.AutoMigrate(values...)
+	return d
 }
 
 // Close ..
