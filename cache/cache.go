@@ -99,7 +99,11 @@ func (c *cache) String(key string) (string, error) {
 }
 
 // SetString 设置字符串
+// ex 为空时，表示永远
 func (c *cache) SetString(key, value string, ex string) (interface{}, error) {
+	if ex == "" {
+		return c.DO("SET", key, value)
+	}
 	return c.DO("SET", key, value, "EX", ex)
 }
 
