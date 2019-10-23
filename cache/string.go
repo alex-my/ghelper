@@ -39,6 +39,9 @@ func (c *cache) MSet(v ...interface{}) {
 	if len(v) == 0 {
 		return
 	}
+	if len(v)%2 != 0 {
+		return
+	}
 
 	c.DO("MSET", v...)
 }
@@ -67,6 +70,13 @@ func (c *cache) Incr(key string) (int64, error) {
 // 加上 increment 之后， key 的值
 func (c *cache) Incrby(key string, increment int64) (int64, error) {
 	return redis.Int64(c.DO("INCRBY", key, increment))
+}
+
+// IncrbyFloat 将 key 所储存的值加上浮点型增量 increment
+// 将 key 所储存的值加上增量 increment
+// 加上 increment 之后， key 的值
+func (c *cache) IncrbyFloat(key string, increment float64) (float64, error) {
+	return redis.Float64(c.DO("INCRBYFLOAT", key, increment))
 }
 
 // Decr 将 key 所储存的值减去 1

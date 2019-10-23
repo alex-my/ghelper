@@ -33,7 +33,12 @@ func main() {
 	}
 
 	if err := testString(c); err != nil {
-		log.Errorf("test1 failed: %s", err.Error())
+		log.Errorf("testString failed: %s", err.Error())
+		return
+	}
+
+	if err := testHash(c); err != nil {
+		log.Errorf("testHash failed: %s", err.Error())
 		return
 	}
 
@@ -165,6 +170,42 @@ func testString(c cache.Cache) error {
 	}
 	if exist {
 		return errors.New("error 14")
+	}
+
+	c.DO("FLUSHDB")
+
+	return nil
+}
+
+func testHash(c cache.Cache) error {
+	var (
+		key                    = "hello"
+		field1, field2, field3 = "field1", "field2", "field3"
+		value1, value2, value3 = "value1", "value2", "value3"
+	)
+
+	c.HMSet(key, field1, value1, field2, value2)
+	c.HSet(key, field3, value3)
+	n := c.HLen(key)
+	if n != 3 {
+		return errors.New("testHash error 1")
+	}
+
+	n = c.HDel(key, field1, field2, "field4")
+	if n != 2 {
+		return errors.New("testHash error 2")
+	}
+
+	vs := c.HGetAll(key)
+
+	// field-value
+	if len(vs) != 2 {
+		return errors.New("testHash error 3")
+	}
+
+	v := c.HGet(key, field3)
+	if v != value3 {
+		return errors.New("testHash error 4")
 	}
 
 	c.DO("FLUSHDB")

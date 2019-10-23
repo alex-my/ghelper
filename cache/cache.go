@@ -21,9 +21,10 @@ type Cache interface {
 
 	Key
 	String
+	Hash
 }
 
-// Key ...
+// Key 键
 type Key interface {
 	Del(key ...interface{}) (int, error)
 	Exists(key string) (bool, error)
@@ -35,7 +36,7 @@ type Key interface {
 	PTTL(key string) (int, error)
 }
 
-// String ...
+// String 字符串
 type String interface {
 	Get(key string) (string, error)
 	Set(key, value string)
@@ -52,7 +53,20 @@ type String interface {
 	GetSet(key, value string) (string, error)
 }
 
-// TODO Hash
+// Hash 哈希表
+type Hash interface {
+	HGet(key, field string) string
+	HSet(key, field, value string)
+	HMGet(v ...interface{}) []string
+	HMSet(v ...interface{})
+	HGetAll(key string) []string
+	HExists(key, field string) bool
+	HDel(v ...interface{}) int
+	HLen(key string) int
+	HIncrby(key, field string, increment int) (int, error)
+	HIncrbyFloat(key, field string, increment float64) (float64, error)
+}
+
 // TODO List
 // TODO Set
 // TODO SortedSet
