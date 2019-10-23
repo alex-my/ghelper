@@ -20,4 +20,4 @@ vendor
 *.pdf
 *.svg
 
-main.go
+./main.go
