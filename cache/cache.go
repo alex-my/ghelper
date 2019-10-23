@@ -7,6 +7,8 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+// 命令的文字注释来自于 http://doc.redisfans.com，稍有修改
+
 var (
 	// ErrInvalidConn 无法获取与 redis-server 的连接
 	ErrInvalidConn = errors.New("invalid conn")
@@ -25,6 +27,7 @@ type Cache interface {
 	String
 	Hash
 	List
+	Set
 }
 
 // Key 键
@@ -87,7 +90,23 @@ type List interface {
 	LIndex(key string, index int) (string, error)
 }
 
-// TODO Set
+// Set 集合
+type Set interface {
+	SAdd(v ...interface{}) (int, error)
+	SCard(key string) (int, error)
+	SDiff(key ...interface{}) ([]string, error)
+	SDiffStore(key ...interface{}) (int, error)
+	SUnion(key ...interface{}) ([]string, error)
+	SUnionStore(key ...interface{}) (int, error)
+	SInter(key ...interface{}) ([]string, error)
+	SInterStore(key ...interface{}) (int, error)
+	SIsMember(key, member string) (bool, error)
+	SMembers(key string) ([]string, error)
+	SPop(key string) (string, error)
+	SRandMember(key string, count int) ([]string, error)
+	SRem(v ...interface{}) (int, error)
+}
+
 // TODO SortedSet
 // TODO Pub/Sub
 // TODO Transaction

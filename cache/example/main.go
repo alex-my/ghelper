@@ -47,6 +47,11 @@ func main() {
 		return
 	}
 
+	if err := testSet(c); err != nil {
+		log.Errorf("testList failed: %s", err.Error())
+		return
+	}
+
 	log.Info("test cache success")
 }
 
@@ -262,5 +267,31 @@ func testList(c cache.Cache) error {
 		return errors.New("testList error 5")
 	}
 
+	c.DO("FLUSHDB")
+	return nil
+}
+
+func testSet(c cache.Cache) error {
+	var (
+		key        = "key"
+		m1, m2, m3 = "m1", "m2", "m3"
+	)
+
+	n, _ := c.SAdd(key, m1, m2, m3)
+	n2, _ := c.SCard(key)
+	if n != n2 {
+		return errors.New("testSet error 1")
+	}
+
+	r, _ := c.SIsMember(key, m3)
+	if !r {
+		return errors.New("testSet error 2")
+	}
+	r, _ = c.SIsMember(key, "m4")
+	if r {
+		return errors.New("testSet error 3")
+	}
+
+	c.DO("FLUSHDB")
 	return nil
 }
