@@ -31,6 +31,11 @@ type Cache interface {
 	SortedSet
 }
 
+// Conn ..
+type Conn interface {
+	redis.Conn
+}
+
 // Key 键
 type Key interface {
 	Del(key ...interface{}) (int, error)
@@ -180,6 +185,12 @@ func (c *cache) DO(cmd string, args ...interface{}) (interface{}, error) {
 	defer conn.Close()
 
 	return conn.Do(cmd, args...)
+}
+
+// Conn 获取 redigo Conn
+func (c *cache) Conn() Conn {
+	conn := c.pool.Get()
+	return conn
 }
 
 func (c *cache) initRedis() error {
