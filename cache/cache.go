@@ -28,6 +28,7 @@ type Cache interface {
 	Hash
 	List
 	Set
+	SortedSet
 }
 
 // Key 键
@@ -107,7 +108,25 @@ type Set interface {
 	SRem(v ...interface{}) (int, error)
 }
 
-// TODO SortedSet
+// SortedSet 有序集合
+type SortedSet interface {
+	ZAdd(v ...interface{}) (int, error)
+	ZCard(key string) (int, error)
+	ZCount(key string, min int, max int) (int, error)
+	ZIncrby(key, member string, incrment int) (int, error)
+	ZRange(key string, start, stop int) ([]string, error)
+	ZRangeWithScores(key string, start, stop int) ([]string, error)
+	ZScore(key, member string) (int, error)
+	ZRank(key, member string) (int, error)
+	ZRangeByScore(key string, min, max, limit, offset, count int) ([]string, error)
+	ZRevRank(key, member string) (int, error)
+	ZRevRangeByScore(key string, max, min, limit, offset, count int) ([]string, error)
+	ZRevRange(key string, start, stop int) ([]string, error)
+	ZRemRangeByScore(key string, min, max int) (int, error)
+	ZRemRangeByRank(key string, start, stop int) (int, error)
+	ZRem(v ...interface{}) (int, error)
+}
+
 // TODO Pub/Sub
 // TODO Transaction
 // TODO Server

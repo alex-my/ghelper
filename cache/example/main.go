@@ -48,7 +48,12 @@ func main() {
 	}
 
 	if err := testSet(c); err != nil {
-		log.Errorf("testList failed: %s", err.Error())
+		log.Errorf("testSet failed: %s", err.Error())
+		return
+	}
+
+	if err := testSortedSet(c); err != nil {
+		log.Errorf("testSortedSet failed: %s", err.Error())
 		return
 	}
 
@@ -293,5 +298,25 @@ func testSet(c cache.Cache) error {
 	}
 
 	c.DO("FLUSHDB")
+	return nil
+}
+
+func testSortedSet(c cache.Cache) error {
+	var (
+		key = "key"
+	)
+
+	n, _ := c.ZAdd(key, "99", "m1", "60", "m2", "88", "m3")
+	n2, _ := c.ZCard(key)
+	if n != n2 {
+		return errors.New("testSortedSet error 1")
+	}
+
+	n3, _ := c.ZCount(key, 80, 100)
+	if n3 != 2 {
+		return errors.New("testSortedSet error 2")
+	}
+
+	// c.DO("FLUSHDB")
 	return nil
 }
