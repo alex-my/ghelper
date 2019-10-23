@@ -10,6 +10,8 @@ import (
 var (
 	// ErrInvalidConn 无法获取与 redis-server 的连接
 	ErrInvalidConn = errors.New("invalid conn")
+	// ErrInvalidParamCount 参数数量错误
+	ErrInvalidParamCount = errors.New("invalid param count")
 )
 
 // Cache 缓存
@@ -22,6 +24,7 @@ type Cache interface {
 	Key
 	String
 	Hash
+	List
 }
 
 // Key 键
@@ -39,11 +42,11 @@ type Key interface {
 // String 字符串
 type String interface {
 	Get(key string) (string, error)
-	Set(key, value string)
-	SetEx(key, value, seconds string)
-	PSetEx(key, value, milliseconds string)
-	MGet(key ...interface{}) []string
-	MSet(v ...interface{})
+	Set(key, value string) error
+	SetEx(key, value, seconds string) error
+	PSetEx(key, value, milliseconds string) error
+	MGet(key ...interface{}) ([]string, error)
+	MSet(v ...interface{}) error
 	Append(key, value string) (int, error)
 	Strlen(key string) (int, error)
 	Incr(key string) (int64, error)
@@ -55,19 +58,35 @@ type String interface {
 
 // Hash 哈希表
 type Hash interface {
-	HGet(key, field string) string
-	HSet(key, field, value string)
-	HMGet(v ...interface{}) []string
-	HMSet(v ...interface{})
-	HGetAll(key string) []string
-	HExists(key, field string) bool
-	HDel(v ...interface{}) int
-	HLen(key string) int
+	HGet(key, field string) (string, error)
+	HSet(key, field, value string) error
+	HMGet(v ...interface{}) ([]string, error)
+	HMSet(v ...interface{}) error
+	HGetAll(key string) ([]string, error)
+	HExists(key, field string) (bool, error)
+	HDel(v ...interface{}) (int, error)
+	HLen(key string) (int, error)
 	HIncrby(key, field string, increment int) (int, error)
 	HIncrbyFloat(key, field string, increment float64) (float64, error)
 }
 
-// TODO List
+// List 列表
+type List interface {
+	LPush(v ...interface{}) (int, error)
+	LPop(key string) (string, error)
+	RPush(v ...interface{}) (int, error)
+	RPop(key string) (string, error)
+	RPopLPush(source, destination string) (string, error)
+	LTrim(key string, start, stop int) error
+	LSet(key string, index int, value string) error
+	LRem(key string, count int, value string) (int, error)
+	LRange(key string, start, stop int) ([]string, error)
+	LLen(key string) (int, error)
+	LInsertBefore(key, pivot, value string) (int, error)
+	LInsertAfter(key, pivot, value string) (int, error)
+	LIndex(key string, index int) (string, error)
+}
+
 // TODO Set
 // TODO SortedSet
 // TODO Pub/Sub

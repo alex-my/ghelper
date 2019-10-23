@@ -42,6 +42,11 @@ func main() {
 		return
 	}
 
+	if err := testList(c); err != nil {
+		log.Errorf("testList failed: %s", err.Error())
+		return
+	}
+
 	log.Info("test cache success")
 }
 
@@ -57,7 +62,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if ttl != -1 {
-		return errors.New("error 1")
+		return errors.New("testString error 1")
 	}
 
 	v, err := c.Get(key)
@@ -65,7 +70,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if v != value {
-		return errors.New("error 2")
+		return errors.New("testString error 2")
 	}
 
 	c.SetEx(key, value, "10")
@@ -87,9 +92,12 @@ func testString(c cache.Cache) error {
 	}
 
 	c.MSet("key-1", "value-1", "key-2", "value-2")
-	vs := c.MGet("key-1", "key-2", "key-3")
+	vs, err := c.MGet("key-1", "key-2", "key-3")
+	if err != nil {
+		return err
+	}
 	if len(vs) != 3 {
-		return errors.New("error 5")
+		return errors.New("testString error 5")
 	}
 
 	c.Set(key, value)
@@ -98,7 +106,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if n != len(key) {
-		return errors.New("error 6")
+		return errors.New("testString error 6")
 	}
 	n, err = c.Append(key, "haha")
 	if err != nil {
@@ -106,7 +114,7 @@ func testString(c cache.Cache) error {
 	}
 	n2, _ := c.Strlen(key)
 	if n != n2 {
-		return errors.New("error 7")
+		return errors.New("testString error 7")
 	}
 
 	c.Set(key, value)
@@ -116,14 +124,14 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if v != value {
-		return errors.New("error 8")
+		return errors.New("testString error 8")
 	}
 	v, err = c.Get(key)
 	if err != nil {
 		return err
 	}
 	if v != newValue {
-		return errors.New("error 9")
+		return errors.New("testString error 9")
 	}
 
 	var (
@@ -137,14 +145,14 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if n64 != 4 {
-		return errors.New("error 10")
+		return errors.New("testString error 10")
 	}
 	n64, err = c.Incrby(nKey, 6)
 	if err != nil {
 		return err
 	}
 	if n64 != 10 {
-		return errors.New("error 11")
+		return errors.New("testString error 11")
 	}
 
 	c.Set(key, value)
@@ -153,7 +161,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if !exist {
-		return errors.New("error 12")
+		return errors.New("testString error 12")
 	}
 
 	delSize, err := c.Del(key, nKey)
@@ -161,7 +169,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if delSize != 2 {
-		return errors.New("error 13")
+		return errors.New("testString error 13")
 	}
 
 	exist, err = c.Exists(key)
@@ -169,7 +177,7 @@ func testString(c cache.Cache) error {
 		return err
 	}
 	if exist {
-		return errors.New("error 14")
+		return errors.New("testString error 14")
 	}
 
 	c.DO("FLUSHDB")
@@ -186,29 +194,73 @@ func testHash(c cache.Cache) error {
 
 	c.HMSet(key, field1, value1, field2, value2)
 	c.HSet(key, field3, value3)
-	n := c.HLen(key)
+	n, err := c.HLen(key)
+	if err != nil {
+		return err
+	}
 	if n != 3 {
 		return errors.New("testHash error 1")
 	}
 
-	n = c.HDel(key, field1, field2, "field4")
+	n, err = c.HDel(key, field1, field2, "field4")
+	if err != nil {
+		return err
+	}
 	if n != 2 {
 		return errors.New("testHash error 2")
 	}
 
-	vs := c.HGetAll(key)
-
+	vs, err := c.HGetAll(key)
+	if err != nil {
+		return err
+	}
 	// field-value
 	if len(vs) != 2 {
 		return errors.New("testHash error 3")
 	}
 
-	v := c.HGet(key, field3)
+	v, err := c.HGet(key, field3)
+	if err != nil {
+		return err
+	}
 	if v != value3 {
 		return errors.New("testHash error 4")
 	}
 
 	c.DO("FLUSHDB")
+
+	return nil
+}
+
+func testList(c cache.Cache) error {
+	var (
+		key            = "key"
+		value1, value2 = "value1", "value2"
+	)
+
+	n, _ := c.LPush(key, value1)
+	if n != 1 {
+		return errors.New("testList error 1")
+	}
+	n, _ = c.RPush(key, value2)
+	if n != 2 {
+		return errors.New("testList error 2")
+	}
+
+	n, _ = c.LLen(key)
+	if n != 2 {
+		return errors.New("testList error 3")
+	}
+
+	v, _ := c.LIndex(key, 0)
+	if v != value1 {
+		return errors.New("testList error 4")
+	}
+
+	vs, _ := c.LRange(key, 0, 100)
+	if len(vs) != 2 || vs[0] != value1 || vs[1] != value2 {
+		return errors.New("testList error 5")
+	}
 
 	return nil
 }

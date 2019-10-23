@@ -10,40 +10,45 @@ func (c *cache) Get(key string) (string, error) {
 }
 
 // Set 将字符串 value 关联到 key
-func (c *cache) Set(key, value string) {
-	c.DO("SET", key, value)
+func (c *cache) Set(key, value string) error {
+	_, err := c.DO("SET", key, value)
+	return err
 }
 
 // SetEx 将字符串 value 关联到 key，并将 key 的生存时间设置为 seconds (秒)
-func (c *cache) SetEx(key, value, seconds string) {
-	c.DO("SET", key, value, "EX", seconds)
+func (c *cache) SetEx(key, value, seconds string) error {
+	_, err := c.DO("SET", key, value, "EX", seconds)
+	return err
 }
 
 // PSetEx 将字符串 value 关联到 key，并将 key 的生存时间设置为 milliseconds (毫秒)
-func (c *cache) PSetEx(key, value, milliseconds string) {
-	c.DO("SET", key, value, "PX", milliseconds)
+func (c *cache) PSetEx(key, value, milliseconds string) error {
+	_, err := c.DO("SET", key, value, "PX", milliseconds)
+	return err
 }
 
 // MGet 返回所有(一个或多个)给定 key 的值
 // v 必须是 字符串集合
 // 如果给定的 key 里面，有某个 key 不存在，那么这个 key 返回特殊值 nil
-func (c *cache) MGet(key ...interface{}) []string {
-	r, _ := redis.Strings(c.DO("MGET", key...))
-	return r
+// MGET key [key ...]
+func (c *cache) MGet(key ...interface{}) ([]string, error) {
+	return redis.Strings(c.DO("MGET", key...))
 }
 
 // MSet 同时设置一个或多个 key-value 对
 // v 必须是 字符串集合
 // 这是一个原子性操作
-func (c *cache) MSet(v ...interface{}) {
+// MSET key value [key value ...]
+func (c *cache) MSet(v ...interface{}) error {
 	if len(v) == 0 {
-		return
+		return nil
 	}
 	if len(v)%2 != 0 {
-		return
+		return ErrInvalidParamCount
 	}
 
-	c.DO("MSET", v...)
+	_, err := c.DO("MSET", v...)
+	return err
 }
 
 // Append 命令将 value 追加到 key 原来的值的末尾
