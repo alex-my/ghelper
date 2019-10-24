@@ -26,7 +26,7 @@ func TestValueWithSign(t *testing.T) {
 
 func TestValueWithCalc(t *testing.T) {
 	// 自定义签名函数
-	calc := func(s string) string {
+	calc := func(s string, k string) string {
 		return s
 	}
 
