@@ -1,6 +1,6 @@
 ## ghelper
 
-golang 辅助库
+golang 辅助库，开发和迭代中，请勿直接用于生产环境
 
 ## TODO
 
@@ -31,6 +31,7 @@ golang 辅助库
 - [x] regexp
 - [ ] redis
 - [ ] rpc
+- [x] sign 签名辅助
 - [ ] template 模版渲染
 - [x] time
 - [ ] validate
