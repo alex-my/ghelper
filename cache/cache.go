@@ -22,6 +22,7 @@ type Cache interface {
 	Open() error
 	Close() error
 	DO(cmd string, args ...interface{}) (interface{}, error)
+	Conn() Conn
 
 	Key
 	String
