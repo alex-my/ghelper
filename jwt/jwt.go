@@ -22,6 +22,25 @@ func Init(opts ...Option) {
 
 // Token 生成 token
 func Token(data ...map[string]interface{}) (string, error) {
+	return createToken(opt.Secret, data...)
+}
+
+// TokenWithKey 生成 token
+func TokenWithKey(key string, data ...map[string]interface{}) (string, error) {
+	return createToken(key, data...)
+}
+
+// Verify 验证 token，并获取自定义内容
+func Verify(s string) (map[string]interface{}, error) {
+	return verify(opt.Secret, s)
+}
+
+// VerifyWithKey 验证 token，并获取自定义内容
+func VerifyWithKey(key, s string) (map[string]interface{}, error) {
+	return verify(key, s)
+}
+
+func createToken(key string, data ...map[string]interface{}) (string, error) {
 	claims := jwt.MapClaims{
 		// 签发时间
 		"iat": time.Now().Unix(),
@@ -37,17 +56,16 @@ func Token(data ...map[string]interface{}) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 
-	return token.SignedString(opt.Secret)
+	return token.SignedString(key)
 }
 
-// Verify 验证 token，并获取自定义内容
-func Verify(s string) (map[string]interface{}, error) {
+func verify(key, s string) (map[string]interface{}, error) {
 	parse, err := jwt.Parse(s, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid jwt method")
 		}
 
-		return opt.Secret, nil
+		return key, nil
 	})
 
 	if err != nil {
