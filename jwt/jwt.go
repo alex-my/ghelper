@@ -20,8 +20,8 @@ func Init(opts ...Option) {
 	}
 }
 
-// Encode ..
-func Encode(data ...map[string]interface{}) (string, error) {
+// Token 生成 token
+func Token(data ...map[string]interface{}) (string, error) {
 	claims := jwt.MapClaims{
 		// 签发时间
 		"iat": time.Now().Unix(),
@@ -40,8 +40,8 @@ func Encode(data ...map[string]interface{}) (string, error) {
 	return token.SignedString(opt.Secret)
 }
 
-// Decode 验证 token，并获取自定义内容
-func Decode(s string) (map[string]interface{}, error) {
+// Verify 验证 token，并获取自定义内容
+func Verify(s string) (map[string]interface{}, error) {
 	parse, err := jwt.Parse(s, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid jwt method")
