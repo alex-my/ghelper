@@ -21,7 +21,7 @@ golang 辅助库，开发和迭代中，请勿直接用于生产环境
 - [x] human
 - [x] http
 - [x] ip
-- [ ] jwt
+- [x] jwt
 - [ ] limiter 限流器
 - [x] logger 简单的日志
 - [ ] network
