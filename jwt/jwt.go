@@ -26,7 +26,7 @@ func Token(data ...map[string]interface{}) (string, error) {
 }
 
 // TokenWithKey 生成 token
-func TokenWithKey(key string, data ...map[string]interface{}) (string, error) {
+func TokenWithKey(key []byte, data ...map[string]interface{}) (string, error) {
 	return createToken(key, data...)
 }
 
@@ -36,11 +36,11 @@ func Verify(s string) (map[string]interface{}, error) {
 }
 
 // VerifyWithKey 验证 token，并获取自定义内容
-func VerifyWithKey(key, s string) (map[string]interface{}, error) {
+func VerifyWithKey(key []byte, s string) (map[string]interface{}, error) {
 	return verify(key, s)
 }
 
-func createToken(key string, data ...map[string]interface{}) (string, error) {
+func createToken(key []byte, data ...map[string]interface{}) (string, error) {
 	claims := jwt.MapClaims{
 		// 签发时间
 		"iat": time.Now().Unix(),
@@ -59,7 +59,7 @@ func createToken(key string, data ...map[string]interface{}) (string, error) {
 	return token.SignedString(key)
 }
 
-func verify(key, s string) (map[string]interface{}, error) {
+func verify(key []byte, s string) (map[string]interface{}, error) {
 	parse, err := jwt.Parse(s, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid jwt method")
