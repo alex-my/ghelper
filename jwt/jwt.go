@@ -3,7 +3,6 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -54,7 +53,7 @@ func createToken(key []byte, data ...map[string]interface{}) (string, error) {
 		}
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString(key)
 }
@@ -78,13 +77,15 @@ func verify(key []byte, s string) (map[string]interface{}, error) {
 		if !ok {
 			return nil, errors.New("no exp in token")
 		}
-		iexp, err := strconv.ParseInt(exp.(string), 10, 64)
-		if err != nil {
-			return nil, errors.New("invalid exp")
+		f64, ok := exp.(float64)
+		if !ok {
+			return nil, errors.New("invalid exp type")
 		}
 
-		if iexp < time.Now().Unix() {
-			return nil, fmt.Errorf("token expired at %d", iexp)
+		i64exp := int64(f64)
+
+		if i64exp < time.Now().Unix() {
+			return nil, fmt.Errorf("token expired at %d", i64exp)
 		}
 
 		payload := make(map[string]interface{}, len(claims))
