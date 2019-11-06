@@ -24,6 +24,7 @@ type Cache interface {
 	DO(cmd string, args ...interface{}) (interface{}, error)
 	Conn() Conn
 
+	Convert
 	Key
 	String
 	Hash
@@ -35,6 +36,26 @@ type Cache interface {
 // Conn ..
 type Conn interface {
 	redis.Conn
+}
+
+// Convert 数据转换
+type Convert interface {
+	Int(reply interface{}, err error) (int, error)
+	Int64(reply interface{}, err error) (int64, error)
+	Uint64(reply interface{}, err error) (uint64, error)
+	Float64(reply interface{}, err error) (float64, error)
+	String(reply interface{}, err error) (string, error)
+	Bytes(reply interface{}, err error) ([]byte, error)
+	Bool(reply interface{}, err error) (bool, error)
+	Float64s(reply interface{}, err error) ([]float64, error)
+	Int64s(reply interface{}, err error) ([]int64, error)
+	Ints(reply interface{}, err error) ([]int, error)
+	ByteSlices(reply interface{}, err error) ([][]byte, error)
+	Strings(reply interface{}, err error) ([]string, error)
+	StringMap(reply interface{}, err error) (map[string]string, error)
+	IntMap(reply interface{}, err error) (map[string]int, error)
+	Int64Map(reply interface{}, err error) (map[string]int64, error)
+	Values(reply interface{}, err error) ([]interface{}, error)
 }
 
 // Key 键
@@ -223,4 +244,68 @@ func (c *cache) initRedis() error {
 	c.pool = pool
 
 	return nil
+}
+
+func (c *cache) Int(reply interface{}, err error) (int, error) {
+	return redis.Int(reply, err)
+}
+
+func (c *cache) Int64(reply interface{}, err error) (int64, error) {
+	return redis.Int64(reply, err)
+}
+
+func (c *cache) Uint64(reply interface{}, err error) (uint64, error) {
+	return redis.Uint64(reply, err)
+}
+
+func (c *cache) Float64(reply interface{}, err error) (float64, error) {
+	return redis.Float64(reply, err)
+}
+
+func (c *cache) String(reply interface{}, err error) (string, error) {
+	return redis.String(reply, err)
+}
+
+func (c *cache) Bytes(reply interface{}, err error) ([]byte, error) {
+	return redis.Bytes(reply, err)
+}
+
+func (c *cache) Bool(reply interface{}, err error) (bool, error) {
+	return redis.Bool(reply, err)
+}
+
+func (c *cache) Float64s(reply interface{}, err error) ([]float64, error) {
+	return redis.Float64s(reply, err)
+}
+
+func (c *cache) Int64s(reply interface{}, err error) ([]int64, error) {
+	return redis.Int64s(reply, err)
+}
+
+func (c *cache) Ints(reply interface{}, err error) ([]int, error) {
+	return redis.Ints(reply, err)
+}
+
+func (c *cache) ByteSlices(reply interface{}, err error) ([][]byte, error) {
+	return redis.ByteSlices(reply, err)
+}
+
+func (c *cache) Strings(reply interface{}, err error) ([]string, error) {
+	return redis.Strings(reply, err)
+}
+
+func (c *cache) StringMap(reply interface{}, err error) (map[string]string, error) {
+	return redis.StringMap(reply, err)
+}
+
+func (c *cache) IntMap(reply interface{}, err error) (map[string]int, error) {
+	return redis.IntMap(reply, err)
+}
+
+func (c *cache) Int64Map(reply interface{}, err error) (map[string]int64, error) {
+	return redis.Int64Map(reply, err)
+}
+
+func (c *cache) Values(reply interface{}, err error) ([]interface{}, error) {
+	return redis.Values(reply, err)
 }
