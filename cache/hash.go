@@ -10,7 +10,7 @@ func (c *cache) HGet(key, field string) (string, error) {
 }
 
 // HSet 将哈希表 key 中的域 field 的值设为 value
-func (c *cache) HSet(key, field, value string) error {
+func (c *cache) HSet(key, field string, value interface{}) error {
 	_, err := c.DO("HSET", key, field, value)
 	return err
 }

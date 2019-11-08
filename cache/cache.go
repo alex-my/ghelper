@@ -73,24 +73,24 @@ type Key interface {
 // String 字符串
 type String interface {
 	Get(key string) (string, error)
-	Set(key, value string) error
-	SetEx(key, value, seconds string) error
-	PSetEx(key, value, milliseconds string) error
+	Set(key string, value interface{}) error
+	SetEx(key string, value interface{}, seconds string) error
+	PSetEx(key string, value interface{}, milliseconds string) error
 	MGet(key ...interface{}) ([]string, error)
 	MSet(v ...interface{}) error
-	Append(key, value string) (int, error)
+	Append(key string, value interface{}) (int, error)
 	Strlen(key string) (int, error)
 	Incr(key string) (int64, error)
 	Incrby(key string, increment int64) (int64, error)
 	Decr(key string) (int64, error)
 	Decrby(key string, decrement int64) (int64, error)
-	GetSet(key, value string) (string, error)
+	GetSet(key string, value interface{}) (string, error)
 }
 
 // Hash 哈希表
 type Hash interface {
 	HGet(key, field string) (string, error)
-	HSet(key, field, value string) error
+	HSet(key, field string, value interface{}) error
 	HMGet(v ...interface{}) ([]string, error)
 	HMSet(v ...interface{}) error
 	HGetAll(key string) ([]string, error)
