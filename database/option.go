@@ -90,6 +90,13 @@ func WithMaxOpenConns(maxOpenConns int) Option {
 	}
 }
 
+// WithMaxConnLifeTime 数据库 maxConnLifeTime
+func WithMaxConnLifeTime(maxConnLifeTime int) Option {
+	return func(d Database) {
+		d.config().maxConnLifeTime = maxConnLifeTime
+	}
+}
+
 // WithLogDebug 是否打印debug日志
 func WithLogDebug(logDebug bool) Option {
 	return func(d Database) {
