@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 
@@ -66,6 +67,9 @@ func (d *database) Open() error {
 	}
 	if d.conf.maxOpenConns > 0 {
 		db.DB().SetMaxOpenConns(d.conf.maxOpenConns)
+	}
+	if d.conf.maxConnLifeTime > 0 {
+		db.DB().SetConnMaxLifetime(time.Duration(d.conf.maxConnLifeTime) * time.Second)
 	}
 
 	// 表名默认不使用复用形式，比如表名使用 user 而不是 users

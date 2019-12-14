@@ -2,27 +2,32 @@ package database
 
 // config 配置文件
 type config struct {
-	username     string
-	password     string
-	host         string
-	port         int
-	dbname       string
-	dialect      string
+	username string
+	password string
+	host     string
+	port     int
+	dbname   string
+	dialect  string
+	// 设置最大闲置的连接数
 	maxIdleConns int
+	// 设置最大打开的连接数
 	maxOpenConns int
-	logDebug     bool
+	// 连接有效时间, 秒
+	maxConnLifeTime int
+	logDebug        bool
 }
 
 func defaultConfig() *config {
 	return &config{
-		username:     "root",
-		password:     "123456",
-		host:         "127.0.0.1",
-		port:         3306,
-		dialect:      "mysql",
-		maxIdleConns: 20,
-		maxOpenConns: 50,
-		logDebug:     false,
+		username:        "root",
+		password:        "123456",
+		host:            "127.0.0.1",
+		port:            3306,
+		dialect:         "mysql",
+		maxIdleConns:    20,
+		maxOpenConns:    50,
+		maxConnLifeTime: 300,
+		logDebug:        false,
 	}
 }
 
