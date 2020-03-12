@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	log, err := logger.NewLogrusLogger("testlog", ".", true, true, time.Hour(7*24), time.Hour(1))
+	log, err := logger.NewLogrusLogger("testlog", "./examplelog", true, true, time.Hour(7*24), time.Hour(1))
 	if err != nil {
 		panic(err)
 	}

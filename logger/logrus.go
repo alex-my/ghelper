@@ -13,6 +13,8 @@ import (
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
+
+	"github.com/alex-my/ghelper/file"
 )
 
 type logrusLog struct {
@@ -28,6 +30,13 @@ type logrusLog struct {
 // rotationTime: 日志切割时间，例如 24*time.Hour 每天切割一次
 func NewLogrusLogger(logName, logPath string, caller, json bool, maxAge, rotationTime time.Duration) (Logger, error) {
 	basePath := path.Join(logPath, logName)
+
+	// 文件夹不存在, 则自动创建
+	if !file.IsDir(logPath) {
+		if err := os.MkdirAll(logPath, os.ModePerm); err != nil {
+			return nil, err
+		}
+	}
 
 	writer, err := rotatelogs.New(
 		basePath+".%Y%m%d.log",
