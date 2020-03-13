@@ -65,6 +65,8 @@ const (
 	YMDHMS3
 	// YMDHMSM 2018-12-31 12:33:55.332
 	YMDHMSM
+	// DEFAULT 2018-12-31 00:03:27
+	DEFAULT
 )
 
 // Date 获取日期，字符串类型
@@ -73,6 +75,7 @@ const (
 func Date(level int) string {
 	format := "2006-01-02 15:04:05"
 	switch level {
+	case DEFAULT:
 	case Y:
 		format = "2006"
 	case YM:
