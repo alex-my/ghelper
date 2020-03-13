@@ -69,10 +69,7 @@ const (
 	DEFAULT
 )
 
-// Date 获取日期，字符串类型
-// param: level 类型
-// eg: Date(YMDHMS) => 2018-12-31 12:33:55
-func Date(level int) string {
+func timeFormat(level int) string {
 	format := "2006-01-02 15:04:05"
 	switch level {
 	case DEFAULT:
@@ -98,7 +95,22 @@ func Date(level int) string {
 		format = "2006-01-02 15:04:05.000"
 	default:
 	}
+
+	return format
+}
+
+// Date 获取日期，字符串类型
+// param: level 类型
+// eg: Date(YMDHMS) => 2018-12-31 12:33:55
+func Date(level int) string {
+	format := timeFormat(level)
 	return time.Now().Format(format)
+}
+
+// ToString 时间戳转字符串
+func ToString(timestamp int64, level int) string {
+	format := timeFormat(level)
+	return time.Unix(timestamp, 0).Format(format)
 }
 
 // Now 获取当前时间戳 秒
