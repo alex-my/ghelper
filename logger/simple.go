@@ -134,12 +134,6 @@ func (l *simpleLog) Fatalf(format string, v ...interface{}) {
 	panic("")
 }
 
-// SetEnable 设置日志是否开启
-// able: true 开启; false 关闭
-func (l *simpleLog) SetEnable(able bool) {
-	l.able = able
-}
-
 // SetPath ..
 func (l *simpleLog) SetPath(path string) {
 
@@ -150,11 +144,29 @@ func (l *simpleLog) SetLevel(level int) {
 	l.level = level
 }
 
+// SetEnable 设置日志是否开启
+// able: true 开启; false 关闭
+func (l *simpleLog) SetEnable(able bool) {
+	l.able = able
+}
+
 // SetConsoleEnable ..
 func (l *simpleLog) SetConsoleEnable(able bool) {
 	// 本日志仅输出到终端
 	l.able = able
 	l.console = able
+}
+
+func (l *simpleLog) isDebugAble() bool {
+	return DEBUG == l.level
+}
+
+func (l *simpleLog) isInfoAble() bool {
+	return l.level <= INFO
+}
+
+func (l *simpleLog) isWarnAble() bool {
+	return l.level <= WARN
 }
 
 func levelName(level int) string {

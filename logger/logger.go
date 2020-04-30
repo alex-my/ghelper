@@ -26,16 +26,20 @@ type Logger interface {
 	// Fatalf 最终调用 panic
 	Fatalf(format string, v ...interface{})
 
-	// SetEnable 设置日志是否开启
-	// able: true 开启; false 关闭
-	SetEnable(able bool)
-
 	// SetPath 设置日志路径
 	SetPath(path string)
 
 	// SetLevel 设置日志响应级别
 	SetLevel(level int)
 
+	// SetEnable 设置日志是否开启
+	// able: true 开启; false 关闭
+	SetEnable(able bool)
+
 	// SetConsoleEnable 是否开启控制台日志
 	SetConsoleEnable(able bool)
+
+	isDebugAble() bool
+	isInfoAble() bool
+	isWarnAble() bool
 }

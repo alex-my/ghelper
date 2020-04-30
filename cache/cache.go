@@ -7,6 +7,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+// redigo 目前不支持 redis 集群
 // 命令的文字注释来自于 http://doc.redisfans.com，稍有修改
 
 var (
@@ -204,6 +205,8 @@ func (c *cache) DO(cmd string, args ...interface{}) (interface{}, error) {
 	if conn == nil {
 		return nil, ErrInvalidConn
 	}
+
+	// 执行结束后，没有错误，没有关闭连接，没有超过 MaxIdle 情况下，activeConn 会放入 idle 队列
 	defer conn.Close()
 
 	return conn.Do(cmd, args...)

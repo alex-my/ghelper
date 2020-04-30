@@ -198,3 +198,15 @@ func (l *logrusLog) SetConsoleEnable(able bool) {
 		l.logger.SetOutput(writer)
 	}
 }
+
+func (l *logrusLog) isDebugAble() bool {
+	return logrus.DebugLevel == l.logger.GetLevel()
+}
+
+func (l *logrusLog) isInfoAble() bool {
+	return l.logger.GetLevel() <= logrus.InfoLevel
+}
+
+func (l *logrusLog) isWarnAble() bool {
+	return l.logger.GetLevel() <= logrus.WarnLevel
+}
