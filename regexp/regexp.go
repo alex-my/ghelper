@@ -13,12 +13,16 @@ const (
 
 	// patternAccount 判断是否是合法的用户名，包含：数字，大小写字母，_，—，其中，数字，_，- 不可以放在开头
 	patternAccount = `^[a-zA-Z]+([-_a-z0-9A-Z]+)*?$`
+
+	// patternEmail 邮件
+	patternEmail = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$"
 )
 
 var (
 	regexpChinesePhone = regexp.MustCompile(patternChinesePhone)
 	regexpNickName     = regexp.MustCompile(patternNickName)
 	regexpAccount      = regexp.MustCompile(patternAccount)
+	regexpEmail        = regexp.MustCompile(patternEmail)
 )
 
 // IsChinesePhone 判断是否是中国大陆手机号
@@ -26,6 +30,7 @@ func IsChinesePhone(phone string) bool {
 	if len(phone) != 11 {
 		return false
 	}
+
 	return regexpChinesePhone.MatchString(phone)
 }
 
@@ -35,6 +40,7 @@ func IsNickName(name string) bool {
 	if name == "" {
 		return false
 	}
+
 	return regexpNickName.MatchString(name)
 }
 
@@ -44,5 +50,15 @@ func IsAccount(account string) bool {
 	if account == "" {
 		return false
 	}
+
 	return regexpAccount.MatchString(account)
+}
+
+// IsEmail 判断是否是邮件
+func IsEmail(email string) bool {
+	if email == "" {
+		return false
+	}
+
+	return regexpEmail.MatchString(email)
 }

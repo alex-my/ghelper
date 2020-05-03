@@ -67,3 +67,34 @@ func TestAccount(t *testing.T) {
 		}
 	}
 }
+
+func TestEmail(t *testing.T) {
+	expects := []RegexpExpect{
+		{
+			Context: "abc@mn.com",
+			Result:  true,
+		},
+		{
+			Context: "abc@mn",
+			Result:  true,
+		},
+		{
+			Context: "123@mn.com",
+			Result:  true,
+		},
+		{
+			Context: "abc@",
+			Result:  false,
+		},
+		{
+			Context: "abc",
+			Result:  false,
+		},
+	}
+
+	for _, expect := range expects {
+		if IsEmail(expect.Context) != expect.Result {
+			t.Errorf("%s result: %t", expect.Context, expect.Result)
+		}
+	}
+}
