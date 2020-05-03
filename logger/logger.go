@@ -39,7 +39,7 @@ type Logger interface {
 	// SetConsoleEnable 是否开启控制台日志
 	SetConsoleEnable(able bool)
 
-	isDebugAble() bool
-	isInfoAble() bool
-	isWarnAble() bool
+	IsDebugAble() bool
+	IsInfoAble() bool
+	IsWarnAble() bool
 }

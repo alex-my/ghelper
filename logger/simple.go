@@ -157,15 +157,15 @@ func (l *simpleLog) SetConsoleEnable(able bool) {
 	l.console = able
 }
 
-func (l *simpleLog) isDebugAble() bool {
+func (l *simpleLog) IsDebugAble() bool {
 	return DEBUG == l.level
 }
 
-func (l *simpleLog) isInfoAble() bool {
+func (l *simpleLog) IsInfoAble() bool {
 	return l.level <= INFO
 }
 
-func (l *simpleLog) isWarnAble() bool {
+func (l *simpleLog) IsWarnAble() bool {
 	return l.level <= WARN
 }
 

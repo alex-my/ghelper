@@ -199,14 +199,14 @@ func (l *logrusLog) SetConsoleEnable(able bool) {
 	}
 }
 
-func (l *logrusLog) isDebugAble() bool {
+func (l *logrusLog) IsDebugAble() bool {
 	return logrus.DebugLevel == l.logger.GetLevel()
 }
 
-func (l *logrusLog) isInfoAble() bool {
+func (l *logrusLog) IsInfoAble() bool {
 	return l.logger.GetLevel() <= logrus.InfoLevel
 }
 
-func (l *logrusLog) isWarnAble() bool {
+func (l *logrusLog) IsWarnAble() bool {
 	return l.logger.GetLevel() <= logrus.WarnLevel
 }
