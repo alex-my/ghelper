@@ -29,7 +29,7 @@ golang 辅助库，开发和迭代中，请勿直接用于生产环境
 - [ ] rbac 用于角色的权限访问控制
 - [x] random
 - [x] regexp
-- [ ] redis
+- [x] redis
 - [ ] rpc
 - [x] sign 签名辅助
 - [ ] template 模版渲染

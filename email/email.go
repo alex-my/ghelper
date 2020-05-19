@@ -27,10 +27,11 @@ func SetConfig(c *Config) {
 }
 
 // Send 发送邮件
+// from: 发送人地址，可以是 xxx@xxx，也可以是 XXX <xxx@xxx>
 // to: 目标邮箱地址，多个地址使用英文逗号隔离
 // subject: 邮件标题
 // html: 邮件内容, 支持 text/html 格式
-func Send(to, subject, html string) error {
+func Send(from, to, subject, html string) error {
 	m := gomail.NewMessage()
 
 	toers := []string{}
@@ -38,7 +39,7 @@ func Send(to, subject, html string) error {
 		toers = append(toers, address)
 	}
 
-	m.SetHeader("From", config.Username)
+	m.SetHeader("From", from)
 	m.SetHeader("To", toers...)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", html)
