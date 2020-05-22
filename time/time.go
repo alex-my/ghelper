@@ -18,33 +18,57 @@ func Sleep(sleepSecond int) {
 	time.Sleep(time.Duration(sleepSecond) * time.Second)
 }
 
-// SleepMS 暂停
+// SleepMillisecond 暂停
 // sleepMS: 暂停毫秒数
-func SleepMS(sleepMS int) {
+func SleepMillisecond(sleepMS int) {
 	if sleepMS <= 0 {
 		return
 	}
-	time.Sleep(time.Duration(sleepMS) * time.Microsecond)
+	time.Sleep(time.Duration(sleepMS) * time.Millisecond)
 }
 
-// Microsecond 设置毫秒
+// SleepMircosecond 暂停
+// sleepMicrosecond: 暂停微秒数
+func SleepMircosecond(sleepMicrosecond int) {
+	if sleepMicrosecond <= 0 {
+		return
+	}
+	time.Sleep(time.Duration(sleepMicrosecond) * time.Microsecond)
+}
+
+// Microsecond 获取微秒
 func Microsecond(microsecond int) time.Duration {
 	return time.Duration(microsecond) * time.Microsecond
 }
 
-// Second 设置秒
+// Millisecond 获取毫秒数
+func Millisecond(millisecond int) time.Duration {
+	return time.Duration(millisecond) * time.Millisecond
+}
+
+// Second 获取秒
 func Second(second int) time.Duration {
 	return time.Duration(second) * time.Second
 }
 
-// Minute 设置分钟
+// Minute 获取分钟
 func Minute(minute int) time.Duration {
 	return time.Duration(minute) * time.Minute
 }
 
-// Hour 设置小时
+// Hour 获取小时
 func Hour(hour int) time.Duration {
 	return time.Duration(hour) * time.Hour
+}
+
+// DaySecond 获取一天有多少秒
+func DaySecond(days ...int) int64 {
+	day := 1
+	if len(days) > 0 {
+		day = days[0]
+	}
+
+	return int64(day * 24 * 60 * 60)
 }
 
 const (
