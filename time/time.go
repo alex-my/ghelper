@@ -27,6 +27,11 @@ func SleepMS(sleepMS int) {
 	time.Sleep(time.Duration(sleepMS) * time.Microsecond)
 }
 
+// Microsecond 设置毫秒
+func Microsecond(microsecond int) time.Duration {
+	return time.Duration(microsecond) * time.Microsecond
+}
+
 // Second 设置秒
 func Second(second int) time.Duration {
 	return time.Duration(second) * time.Second
