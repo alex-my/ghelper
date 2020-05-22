@@ -71,6 +71,11 @@ func DaySecond(days ...int) int64 {
 	return int64(day * 24 * 60 * 60)
 }
 
+// After time.After
+func After(d time.Duration) <-chan time.Time {
+	return time.After(d)
+}
+
 const (
 	// Y 2018
 	Y int = iota
