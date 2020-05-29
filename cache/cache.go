@@ -15,6 +15,9 @@ var (
 	ErrInvalidConn = errors.New("invalid conn")
 	// ErrInvalidParamCount 参数数量错误
 	ErrInvalidParamCount = errors.New("invalid param count")
+
+	// ErrNil 当无内容时
+	ErrNil = redis.ErrNil
 )
 
 // Cache 缓存
