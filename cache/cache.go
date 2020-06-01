@@ -212,6 +212,10 @@ func (c *cache) DO(cmd string, args ...interface{}) (interface{}, error) {
 	// 执行结束后，没有错误，没有关闭连接，没有超过 MaxIdle 情况下，activeConn 会放入 idle 队列
 	defer conn.Close()
 
+	if err := conn.Err(); err != nil {
+		return nil, err
+	}
+
 	return conn.Do(cmd, args...)
 }
 
@@ -226,25 +230,25 @@ func (c *cache) initRedis() error {
 
 	pool := &redis.Pool{
 		MaxIdle:     conf.maxIdle,
-		MaxActive:   conf.maxActive,
 		IdleTimeout: conf.idleTimeout,
+		MaxActive:   conf.maxActive,
+		Wait:        conf.wait,
 	}
 
 	// 创建新连接
 	pool.Dial = func() (redis.Conn, error) {
-		options := redis.DialPassword(conf.password)
 		addr := fmt.Sprintf("%s:%d", conf.host, conf.port)
-		conn, err := redis.Dial("tcp", addr, options)
-		if err != nil {
-			return nil, err
-		}
+		conn, err := redis.Dial(
+			"tcp",
+			addr,
+			redis.DialPassword(conf.password),
+			redis.DialDatabase(conf.db),
+			redis.DialReadTimeout(conf.dialReadTimeout),
+			redis.DialWriteTimeout(conf.dialWriteTimeout),
+			redis.DialConnectTimeout(conf.dialConnectTimeout),
+		)
 
-		if _, err := conn.Do("SELECT", conf.db); err != nil {
-			conn.Close()
-			return nil, err
-		}
-
-		return conn, nil
+		return conn, err
 	}
 
 	c.pool = pool
