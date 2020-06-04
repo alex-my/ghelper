@@ -10,9 +10,9 @@ type config struct {
 	dialect  string
 	// 设置最大闲置的连接数
 	maxIdleConns int
-	// 设置最大打开的连接数
+	// 设置最大打开的连接数，show variables like '%max_connections%'
 	maxOpenConns int
-	// 连接有效时间, 秒
+	// 连接有效时间，秒，show variables like '%timeout%'，其中的 wait_timeout
 	maxConnLifeTime int
 	logDebug        bool
 }
