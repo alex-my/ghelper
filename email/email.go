@@ -1,5 +1,9 @@
 package email
 
+// Package 发送邮件
+// 务必注意邮件头中泄露服务器IP信息
+// 查看邮件头中: Received: from xxx
+
 import (
 	"strings"
 
