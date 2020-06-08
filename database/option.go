@@ -13,6 +13,7 @@ type config struct {
 	// 设置最大打开的连接数，show variables like '%max_connections%'
 	maxOpenConns int
 	// 连接有效时间，秒，show variables like '%timeout%'，其中的 wait_timeout
+	// 对于空闲连接，数据库在 wait_timeout 后会关闭，这时候客户端再调用，会报 invalid connection 错误
 	maxConnLifeTime int
 	logDebug        bool
 }
