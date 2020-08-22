@@ -3,6 +3,7 @@ package codec
 import (
 	"errors"
 
+	"github.com/alex-my/ghelper/codec"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -14,7 +15,7 @@ var (
 type protobufCodec struct{}
 
 // NewProtobufCodec 创建默认的编码与解码器
-func NewProtobufCodec() Codec {
+func NewProtobufCodec() codec.Codec {
 	return &protobufCodec{}
 }
 
@@ -36,4 +37,14 @@ func (c *protobufCodec) Decode(in []byte, out interface{}) error {
 	}
 
 	return proto.Unmarshal(in, m)
+}
+
+// Name 名称
+func (*protobufCodec) Name() string {
+	return "protobuf"
+}
+
+// MimeType 媒体类型
+func (*protobufCodec) MimeType() string {
+	return "application/binary"
 }
