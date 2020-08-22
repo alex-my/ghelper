@@ -7,7 +7,7 @@ type Codec interface {
 	Encode(in interface{}) ([]byte, error)
 
 	// Decode 将 []byte 转为数据
-	Decode(int []byte, out interface{}) error
+	Decode(in []byte, out interface{}) error
 
 	// Name 名称
 	Name() string
