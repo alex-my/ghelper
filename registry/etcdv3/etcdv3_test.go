@@ -55,6 +55,31 @@ func TestRegister(t *testing.T) {
 	}
 }
 
+func TestRepeatRegister(t *testing.T) {
+	r, err := etcdv3.NewEtcdv3(
+		registry.WithAddrs("127.0.0.1:7179", "127.0.0.1:7279", "127.0.0.1:7379"),
+	)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	names := []string{"test-name-register-1", "test-name-register-1"}
+
+	for _, name := range names {
+		services := newServices(name)
+		if err := r.Register(services); err != nil {
+			t.Fatal(err.Error())
+		}
+
+		service, err := r.Service(name)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		t.Log(service.String())
+	}
+}
+
 func TestDeregister(t *testing.T) {
 	r, err := etcdv3.NewEtcdv3(
 		registry.WithAddrs("127.0.0.1:7179", "127.0.0.1:7279", "127.0.0.1:7379"),
