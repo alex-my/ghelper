@@ -6,6 +6,7 @@ golang 辅助库，开发和迭代中，请勿直接用于生产环境
 
 - [x] array
 - [x] buffer
+- [ ] broker 异步通信
 - [x] bytes
 - [ ] captcha
 - [x] codec 编码与解码器
@@ -33,4 +34,5 @@ golang 辅助库，开发和迭代中，请勿直接用于生产环境
 - [x] sign 签名辅助
 - [ ] template 模版渲染
 - [x] time
+- [ ] transport 同步通信
 - [ ] validate
