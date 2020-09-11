@@ -11,6 +11,7 @@ golang 辅助库，开发和迭代中，请勿直接用于生产环境
 - [x] codec 编码与解码器
 - [x] compress 压缩
 - [x] config
+- [x] constants 常量
 - [ ] convert
 - [x] crypto
 - [x] database
