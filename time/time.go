@@ -153,9 +153,14 @@ func Now() int64 {
 	return time.Now().Unix()
 }
 
-// MS 获取当前 毫秒
+// MS 获取当前 毫秒 millisecond
 func MS() int64 {
 	return time.Now().UnixNano() / 1e6
+}
+
+// WS 获取当前 微秒 microsecond
+func WS() int64 {
+	return time.Now().UnixNano() / 1e3
 }
 
 // Nano 获取当前 纳秒
